@@ -25,14 +25,13 @@ export const DEFAULT_SETTINGS = {
   amounts: '50,100,200,500,1000',
   bankDetails: '',
   facebook: '', instagram: '', tiktok: '', x: '',
-  galleryIntro: 'Our projects, told in pictures. Photographs are grouped by project. Click any one to see it larger.',
   nextOn: false, nextTitle: '', nextDate: '', nextTime: '', nextPlace: '', nextText: '', nextImage: '', nextCta: '', nextLink: '',
-  slideSeconds: 5.5
+  slideSeconds: 6
 };
 export const DEFAULT_SLIDES = [
-  {caption:'Our volunteers', image:'assets/outreach-blazer.jpg', alt:'The founder with a volunteer usher at an outreach event', pos:'50% 30%', order:1, published:true},
-  {caption:'Free breast cancer screening', image:'assets/screening-banner.jpg', alt:'The founder with a volunteer in front of the breast cancer awareness banner', pos:'50% 45%', order:2, published:true},
-  {caption:'Out in the community', image:'assets/outreach-venue.jpg', alt:'The founder and volunteers with a young girl at an outreach venue', pos:'50% 35%', order:3, published:true}
+  {title:'', text:'', image:'assets/outreach-blazer.jpg', alt:'The founder with a volunteer usher at an outreach event', pos:'50% 30%', order:1, published:true},
+  {title:'Hope. Fight. Cure.', text:'Free breast cancer screening, blood pressure checks and honest talk about early detection, taken to where women already gather.', image:'assets/screening-banner.jpg', alt:'The founder with a volunteer in front of the breast cancer awareness banner', pos:'50% 45%', order:2, published:true},
+  {title:'Dignity should never depend on what a family can afford.', text:'From sanitary pads to street meals, our volunteers show up hand to hand, one pack and one plate at a time.', image:'assets/outreach-venue.jpg', alt:'The founder and volunteers with a young girl at an outreach venue', pos:'50% 35%', order:3, published:true}
 ];
 export const DEFAULT_PILLARS = [
   {title:'Women empowerment', text:'Skills, mentorship and opportunities that help women lead.', icon:'empower', order:1, published:true},

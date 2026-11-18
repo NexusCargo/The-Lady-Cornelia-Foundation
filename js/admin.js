@@ -10,7 +10,7 @@ const when=t=>{const d=t?.toDate?t.toDate():t?new Date(t):null;return d?d.toLoca
 const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2600)};
 
 const fb=window.LCF_CONFIG?.firebase,cl=window.LCF_CONFIG?.cloudinary;
-if(!fb||/REPLACE/.test(fb.apiKey)){
+if(!fb||!fb.apiKey){
  $('#login').hidden=false;$('#lf').innerHTML='<h1>Not configured</h1>';
  throw new Error('Firebase not configured');
 }
@@ -47,7 +47,7 @@ function resize(file,max=1800){
  });
 }
 async function upload(file){
- if(!cl||/REPLACE/.test(cl.cloudName))throw new Error('Uploads unavailable');
+ if(!cl||!cl.cloudName)throw new Error('Uploads unavailable');
  const fd=new FormData();fd.append('file',await resize(file));fd.append('upload_preset',cl.uploadPreset);fd.append('folder','lady-cornelia');
  const r=await fetch(`https://api.cloudinary.com/v1_1/${cl.cloudName}/image/upload`,{method:'POST',body:fd});
  const j=await r.json();if(!r.ok)throw new Error(j.error?.message||'Upload failed');return j.secure_url;
@@ -57,9 +57,9 @@ function pickFile(cb){const i=document.createElement('input');i.type='file';i.ac
 const ICON_OPTS=Object.keys(ICONS);
 const C={
  slides:{label:'Hero slides',single:'slide',def:DEFAULT_SLIDES,fields:[
-  {k:'image',t:'image',label:'Photo',req:1,full:1},{k:'caption',t:'text',label:'Caption',full:1},{k:'alt',t:'text',label:'Photo description',full:1},
+  {k:'image',t:'image',label:'Photo',req:1,full:1},{k:'title',t:'text',label:'Headline (blank uses the site headline)',full:1},{k:'text',t:'textarea',label:'Paragraph (blank uses the site paragraph)',rows:3,full:1},{k:'alt',t:'text',label:'Photo description',full:1},
   {k:'pos',t:'pos',label:'Focus point',full:1},{k:'order',t:'number',label:'Order'},{k:'published',t:'check',label:'Show on website',def:true}],
-  title:i=>i.caption||'(no caption)',thumb:i=>i.image,meta:i=>''},
+  title:i=>i.title||'Main headline',thumb:i=>i.image,meta:i=>''},
  programmes:{label:'Programmes',single:'programme',def:DEFAULT_PROGRAMMES,fields:[
   {k:'title',t:'text',label:'Title',req:1,full:1},{k:'body',t:'textarea',label:'Description',rows:6,full:1},
   {k:'order',t:'number',label:'Order'},{k:'published',t:'check',label:'Show on website',def:true}],
@@ -75,7 +75,7 @@ const C={
 };
 const SET_GROUPS=[
  ['Next project banner',[['nextOn','check','Show the banner on the website'],['nextTitle','text','Project name'],['nextDate','date','Date'],['nextTime','text','Time (for example 9:00 AM)'],['nextPlace','text','Place'],['nextText','textarea','Short description',4],['nextImage','image','Photo (optional)'],['nextCta','text','Button text'],['nextLink','text','Button link (leave empty to open the donate form)']]],
- ['Hero & intro',[['heroTitle','text','Hero headline'],['heroLead','textarea','Hero paragraph'],['slideSeconds','number','Seconds per hero slide'],['mission','textarea','Mission'],['vision','textarea','Vision'],['supportIntro','text','“What we support” intro'],['programmesIntro','textarea','“Our programmes” intro'],['galleryIntro','textarea','“Gallery” intro']]],
+ ['Hero & intro',[['heroTitle','text','Hero headline'],['heroLead','textarea','Hero paragraph'],['slideSeconds','number','Seconds per hero slide'],['mission','textarea','Mission'],['vision','textarea','Vision'],['supportIntro','text','“What we support” intro'],['programmesIntro','textarea','“Our programmes” intro']]],
  ['Founder',[['founderName','text','Name'],['founderRole','text','Role line'],['founderBio','textarea','Biography',8],['founderQuote','text','Quote'],['founderPhoto','image','Portrait photo']]],
  ['Contact & footer',[['tagline','text','Footer tagline'],['email','text','Foundation email'],['phone','text','Phone'],['facebook','text','Facebook URL'],['instagram','text','Instagram URL'],['tiktok','text','TikTok URL'],['x','text','X / Twitter URL']]],
  ['Giving',[['paystackKey','text','Paystack public key'],['amounts','text','Quick amounts (GH₵, comma separated)'],['bankDetails','textarea','Bank transfer details',5]]]

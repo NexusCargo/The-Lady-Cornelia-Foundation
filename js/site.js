@@ -1,6 +1,6 @@
 import {ICONS,DEFAULT_SETTINGS,DEFAULT_SLIDES,DEFAULT_PILLARS,DEFAULT_PROGRAMMES,DEFAULT_GALLERY} from './defaults.js';
 
-const SEL='.arch img,.pol img';
+const SEL='.hslide img,.pol img';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const paras=t=>String(t||'').split(/\n{2,}/).map(p=>p.trim()).filter(Boolean).map(p=>`<p>${esc(p)}</p>`).join('');
@@ -15,9 +15,8 @@ let db=null,FS=null;
 const fb=window.LCF_CONFIG?.firebase;
 
 function renderText(){
- $('#heroTitle').textContent=S.heroTitle;$('#heroLead').textContent=S.heroLead;
  $('#mission').textContent=S.mission;$('#vision').textContent=S.vision;
- $('#supportIntro').textContent=S.supportIntro;$('#galleryIntro').textContent=S.galleryIntro;$('#programmesIntro').textContent=S.programmesIntro;
+ $('#supportIntro').textContent=S.supportIntro;$('#programmesIntro').textContent=S.programmesIntro;
  $('#founderName').textContent=S.founderName;$('#founderRole').textContent=S.founderRole;
  $('#founderBio').innerHTML=paras(S.founderBio);$('#founderQuote').textContent=S.founderQuote;
  const ph=$('#founderPhoto');if(S.founderPhoto&&ph.getAttribute('src')!==S.founderPhoto)ph.src=S.founderPhoto;
@@ -48,56 +47,53 @@ function renderNext(){
  $('.nx-card').classList.toggle('noimg',!S.nextImage);
  box.hidden=false;
 }
-const firstSentence=t=>String(t||'').trim().split(/(?<=[.!?])\s/)[0];
-const flipCard=(m,kick,note)=>`<figure class="fcard" tabindex="0" role="group" aria-label="${esc(m.caption||kick)}"><div class="fl-in"><div class="fl-f"><img src="${esc(m.url)}" alt="${esc(m.alt||m.caption||kick)}" style="object-position:${esc(m.pos||'50% 50%')}" loading="lazy">${m.caption?`<figcaption>${esc(m.caption)}</figcaption>`:''}</div><div class="fl-b"><span class="kick">${esc(kick)}</span><strong>${esc(m.caption||kick)}</strong>${(m.note||note)?`<p>${esc(m.note||note)}</p>`:''}<button type="button" data-zoom>View photo</button></div></div></figure>`;
 function renderPillars(list){
  $('#pillars').innerHTML=list.map(p=>`<div class="pillar"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[p.icon]||ICONS.heart}</svg><h3>${esc(p.title)}</h3><p>${esc(p.text)}</p></div>`).join('');
 }
-const slug=t=>String(t||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-const stamp=c=>{const t=c.updatedAt;return t?.toDate?t.toDate().getTime():t?new Date(t).getTime()||0:0};
-let galData=[],galSort='name';
 function renderProgrammes(list){
  programmes=list;
- $('#programmeList').innerHTML=`<div class="pcards">${list.map((p,i)=>`<article class="pcard" data-slug="${slug(p.title)}"><span class="num">${String(i+1).padStart(2,'0')}</span><h3>${esc(p.title)}</h3>${paras(p.body)}<a href="#gallery">See the photos</a></article>`).join('')}</div>`;
+ $('#programmeList').innerHTML=`<div class="pcards">${list.map((p,i)=>`<article class="pcard"><span class="num">${String(i+1).padStart(2,'0')}</span><h3>${esc(p.title)}</h3>${paras(p.body)}<a href="#gallery">See the photos</a></article>`).join('')}</div>`;
  $('#dfor').innerHTML='<option value="General">Where it is needed most</option>'+list.map(p=>`<option>${esc(p.title)}</option>`).join('');
 }
 function renderGallery(list){
- galData=list.map(c=>({...c,gallery:(c.gallery||[]).filter(m=>fresh(m.url)).slice(0,8)}));
- drawGallery();
+ const sets=list.map(c=>(c.gallery||[]).filter(m=>fresh(m.url)).slice(0,8)),out=[];
+ for(let i=0;sets.some(s=>i<s.length);i++)sets.forEach(s=>s[i]&&out.push(s[i]));
+ $('#galleryList').innerHTML=out.map(m=>`<figure class="pol"><img src="${esc(m.url)}" alt="${esc(m.alt||m.caption||'Photo from our projects')}" loading="lazy"></figure>`).join('');
 }
-function drawGallery(){
- const l=galData.filter(c=>c.gallery.length).sort(galSort==='date'?(a,b)=>stamp(b)-stamp(a)||(a.order??0)-(b.order??0):(a,b)=>String(a.title).localeCompare(String(b.title)));
- $$('.gsort button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.sort===galSort)));
- $('#gJump').innerHTML=l.map(c=>`<a href="#g-${slug(c.title)}">${esc(c.title)}</a>`).join('');
- $('#galleryList').innerHTML=l.map(c=>{
-  const t=stamp(c),n=c.gallery.length;
-  const pics=c.gallery.map(m=>`<figure class="pol"><img src="${esc(m.url)}" alt="${esc(m.alt||m.caption||c.title)}" loading="lazy">${m.caption?`<figcaption>${esc(m.caption)}</figcaption>`:''}</figure>`).join('');
-  return `<section class="gproj" id="g-${slug(c.title)}"><div class="gproj-head"><h3>${esc(c.title)}</h3><span class="count">${n} photo${n===1?'':'s'}${t?' · Updated '+new Date(t).toLocaleDateString('en-GB',{month:'long',year:'numeric'}):''}</span></div><div class="pgrid">${pics}</div></section>`;
- }).join('')||'<p>Photos are coming soon.</p>';
- $$('.pcard').forEach(a=>{const el=document.getElementById('g-'+a.dataset.slug),k=a.querySelector('a');if(el){const n=el.querySelectorAll('.pol').length;k.href='#g-'+a.dataset.slug;k.textContent=`See ${n} photo${n===1?'':'s'}`;k.hidden=false}else k.hidden=true});
-}
-document.addEventListener('click',e=>{const b=e.target.closest('.gsort button');if(b){galSort=b.dataset.sort;drawGallery()}});
 
-const SS={i:0,timer:null,held:false,slides:[]};
-const root=$('.arch-wrap'),badge=root.querySelector('.badge');
-function ssGo(n){
- const L=SS.slides.length;if(!L)return;SS.i=(n+L)%L;
- const c=SS.slides[SS.i].dataset.caption||'';badge.textContent=c;badge.hidden=!c;
- SS.slides.forEach((s,k)=>{const a=k===SS.i;s.classList.toggle('is-active',a);s.setAttribute('aria-hidden',String(!a));a?s.removeAttribute('inert'):s.setAttribute('inert','')});
+const SS={i:0,timer:null,slides:[],dots:[]};
+const vp=$('#slides');
+function ssGo(n,dir=1){
+ const L=SS.slides.length;if(!L)return;
+ const old=SS.i;SS.i=((n%L)+L)%L;
+ SS.slides.forEach((s,k)=>{
+  const on=k===SS.i;
+  if(on){
+   if(old!==SS.i){s.style.transition='none';s.style.transform=`translateX(${dir*100}%)`;void s.offsetWidth}
+   s.style.transition='';s.style.transform='translateX(0)';
+  }else if(k===old&&old!==SS.i){s.style.transition='';s.style.transform=`translateX(${-dir*100}%)`}
+  else{s.style.transition='none';s.style.transform=`translateX(${dir*100}%)`}
+  s.setAttribute('aria-hidden',String(!on));on?s.removeAttribute('inert'):s.setAttribute('inert','');
+ });
+ SS.dots.forEach((d,k)=>d.setAttribute('aria-current',String(k===SS.i)));
 }
 function ssStop(){clearInterval(SS.timer);SS.timer=null}
-function ssStart(){ssStop();if(!SS.held&&SS.slides.length>1)SS.timer=setInterval(()=>ssGo(SS.i+1),Math.max(2,+S.slideSeconds||5.5)*1000)}
+function ssStart(){ssStop();if(SS.slides.length>1)SS.timer=setInterval(()=>ssGo(SS.i+1,1),Math.max(2,+S.slideSeconds||6)*1000)}
 function renderSlides(list){
  list=list.filter(s=>fresh(s.image));
- $('#slides').innerHTML=list.map((s,k)=>`<div class="slide" data-caption="${esc(s.caption||'')}"><img src="${esc(s.image)}" alt="${esc(s.alt||s.caption||'')}" style="object-position:${esc(s.pos||'50% 50%')}"${k?' loading="lazy"':''}></div>`).join('');
- SS.slides=$$('#slides .slide');
+ vp.innerHTML=list.map((s,k)=>{
+  const t=esc((s.title||'').trim()||S.heroTitle),x=esc((s.text||'').trim()||S.heroLead);
+  return `<div class="hslide"><div class="wrap"><div class="hero-copy">${k?`<h2 class="hero-h">${t}</h2>`:`<h1 class="hero-h">${t}</h1>`}<p class="lead">${x}</p><div class="actions"><a class="btn" href="#involved">Join our work</a><a class="btn ghost" href="#about">Our mission</a></div></div><div class="arch-wrap"><div class="frame"><div class="arch"><img src="${esc(s.image)}" alt="${esc(s.alt||'')}" style="object-position:${esc(s.pos||'50% 50%')}"${k?' loading="lazy"':''}></div></div></div></div></div>`;
+ }).join('');
+ SS.slides=$$('#slides .hslide');
+ $('#heroDots').innerHTML=SS.slides.length>1?SS.slides.map((_,k)=>`<button type="button" data-go="${k}" aria-label="Show slide ${k+1}"></button>`).join(''):'';
+ SS.dots=$$('#heroDots button');SS.i=0;
  ssGo(0);ssStart();
 }
-root.addEventListener('mouseenter',()=>{SS.held=true;ssStart()});root.addEventListener('mouseleave',()=>{SS.held=false;ssStart()});
-root.addEventListener('focusin',()=>{SS.held=true;ssStart()});root.addEventListener('focusout',()=>{SS.held=false;ssStart()});
+$('#heroDots').addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(!b)return;const k=+b.dataset.go;ssGo(k,k>=SS.i?1:-1);ssStart()});
 let x0=null;
-root.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});
-root.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>40){ssGo(SS.i+(dx<0?1:-1));ssStart()}});
+vp.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});
+vp.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>40){ssGo(SS.i+(dx<0?1:-1),dx<0?1:-1);ssStart()}});
 document.addEventListener('visibilitychange',()=>{document.hidden?ssStop():ssStart()});
 
 const hv=$('#homeView'),gv=$('#galleryView');
@@ -112,17 +108,21 @@ function route(first){
 addEventListener('hashchange',()=>route(false));
 
 let joinType='volunteer',paying=false;
+const lb=$('#lb'),lbImg=lb.querySelector('img');
+let lbList=[],lbI=0;
+function lbShow(i){lbI=(i+lbList.length)%lbList.length;const m=lbList[lbI];lbImg.src=m.currentSrc||m.src;lbImg.alt=m.alt}
+function lbOpen(img){lbList=img.closest('#galleryList')?$$('#galleryList img'):[img];lb.classList.toggle('single',lbList.length<2);lbShow(lbList.indexOf(img));lb.showModal()}
+lb.addEventListener('click',e=>{const n=e.target.closest('.lb-nav');if(n){lbShow(lbI+(n.dataset.d==='next'?1:-1));return}lb.close()});
 document.addEventListener('click',e=>{
- const z=e.target.closest('[data-zoom]');
- if(z){const im=z.closest('figure').querySelector('.fl-f img'),l=$('#lb img');l.src=im.src;l.alt=im.alt;$('#lb').showModal();return}
- const fc=e.target.closest('figure.fcard');
- if(fc&&!matchMedia('(hover:hover)').matches){fc.classList.toggle('is-flipped');return}
  const o=e.target.closest('[data-open]');
  if(o){const d=$('#'+o.dataset.open);if(o.dataset.title){$('#jt').textContent=o.dataset.title;joinType=o.dataset.type||'volunteer'}d.showModal();return}
  const img=e.target.closest(SEL);
- if(img){const l=$('#lb img');l.src=img.src;l.alt=img.alt;$('#lb').showModal()}
+ if(img)lbOpen(img);
 });
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('figure.fcard.is-flipped').forEach(f=>f.classList.remove('is-flipped'));if((e.key==='Enter'||e.key===' ')&&e.target.matches?.(SEL)){e.preventDefault();e.target.click()}});
+document.addEventListener('keydown',e=>{
+ if(lb.open&&(e.key==='ArrowRight'||e.key==='ArrowLeft')&&lbList.length>1){lbShow(lbI+(e.key==='ArrowRight'?1:-1));return}
+ if((e.key==='Enter'||e.key===' ')&&e.target.matches?.(SEL)){e.preventDefault();e.target.click()}
+});
 $$('dialog').forEach(d=>{
  d.addEventListener('click',e=>{if(e.target===d||e.target.closest('[data-close]'))d.close()});
  d.addEventListener('close',()=>{if(paying)return;$('#dform').hidden=false;$('#dthanks').hidden=true;$('#jform').hidden=false;$('#jthanks').hidden=true});
@@ -220,7 +220,7 @@ $('#df').addEventListener('submit',e=>{
 function applyAll(slides,pillars,progs,gallery){renderText();used.clear();used.add(S.founderPhoto);if(S.nextOn&&S.nextImage)used.add(S.nextImage);renderSlides(slides);renderPillars(pillars);renderProgrammes(progs);renderGallery(gallery)}
 applyAll(DEFAULT_SLIDES,DEFAULT_PILLARS,DEFAULT_PROGRAMMES,DEFAULT_GALLERY);
 route(true);
-if(fb&&!/REPLACE/.test(fb.apiKey)){
+if(fb&&fb.apiKey){
  try{
   const V='10.14.1',[{initializeApp},fs]=await Promise.all([import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`),import(`https://www.gstatic.com/firebasejs/${V}/firebase-firestore.js`)]);
   FS=fs;db=fs.getFirestore(initializeApp(fb));
