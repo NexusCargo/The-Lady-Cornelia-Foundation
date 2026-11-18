@@ -8,7 +8,9 @@ const byOrder=(a,b)=>(a.order??0)-(b.order??0);
 const used=new Set();
 const fresh=u=>{if(!u||used.has(u))return false;used.add(u);return true};
 const okMail=e=>/^\S+@\S+\.\S+$/.test(e);
-const fmt=n=>'GH₵'+(+n).toLocaleString('en-GH',{minimumFractionDigits:Number.isInteger(+n)?0:2,maximumFractionDigits:2});
+const fmtN=n=>(+n).toLocaleString('en-GH',{minimumFractionDigits:Number.isInteger(+n)?0:2,maximumFractionDigits:2});
+const fmt=n=>'GH₵'+fmtN(n);
+const fmtH=n=>`<span class="cur">GH₵</span><span class="num">${fmtN(n)}</span>`;
 
 let S={...DEFAULT_SETTINGS},programmes=DEFAULT_PROGRAMMES;
 let db=null,FS=null;
@@ -23,7 +25,7 @@ function renderText(){
  $('#tagline').textContent=S.tagline;$('#yr').textContent=new Date().getFullYear();
  const links=[['Facebook',S.facebook],['Instagram',S.instagram],['TikTok',S.tiktok],['X',S.x]].filter(l=>l[1]);
  $('#social').innerHTML=links.map(([n,u])=>`<a href="${esc(u)}" target="_blank" rel="noopener">${n}</a>`).join('');
- $('#chips').innerHTML=String(S.amounts).split(',').map(a=>+a.trim()).filter(a=>a>0).slice(0,5).map(a=>`<button type="button" class="chip" data-amt="${a}">${fmt(a)}</button>`).join('')+'<button type="button" class="chip" data-other>Other</button>';
+ $('#chips').innerHTML=String(S.amounts).split(',').map(a=>+a.trim()).filter(a=>a>0).slice(0,5).map(a=>`<button type="button" class="chip" data-amt="${a}">${fmtH(a)}</button>`).join('')+'<button type="button" class="chip" data-other>Other</button>';
  renderNext();
  syncDonate();
 }
@@ -31,7 +33,8 @@ function renderNext(){
  const box=$('#next'),on=S.nextOn&&String(S.nextTitle||'').trim();
  let d=null,left=null;
  if(/^\d{4}-\d{2}-\d{2}$/.test(S.nextDate||'')){const [y,m,dd]=S.nextDate.split('-').map(Number);d=new Date(y,m-1,dd);const t=new Date();left=Math.round((d-new Date(t.getFullYear(),t.getMonth(),t.getDate()))/864e5)}
- if(!on||(left!==null&&left<0)){box.hidden=true;return}
+ const wr=$('.mv .wrap');
+ if(!on||(left!==null&&left<0)){box.hidden=true;wr.classList.add('solo');return}
  $('#nxTitle').textContent=S.nextTitle;
  const meta=[];
  if(left!==null)meta.push([left===0?'Today':left===1?'Tomorrow':`In ${left} days`,'soon']);
@@ -45,7 +48,7 @@ function renderNext(){
  $('#nxAct').innerHTML=/^https?:\/\//i.test(link)?`<a class="btn" href="${esc(link)}" target="_blank" rel="noopener">${esc(cta)}</a>`:`<button type="button" class="btn" data-open="donate">${esc(cta)}</button>`;
  const im=$('#nxImg');im.hidden=!S.nextImage;if(S.nextImage)im.querySelector('img').src=S.nextImage;
  $('.nx-card').classList.toggle('noimg',!S.nextImage);
- box.hidden=false;
+ box.hidden=false;wr.classList.remove('solo');
 }
 function renderPillars(list){
  $('#pillars').innerHTML=list.map(p=>`<div class="pillar"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[p.icon]||ICONS.heart}</svg><h3>${esc(p.title)}</h3><p>${esc(p.text)}</p></div>`).join('');
@@ -157,7 +160,7 @@ function syncDonate(){
  chips.forEach(c=>c.setAttribute('aria-pressed',String(a>0&&+c.dataset.amt===a)));
  const oth=$('.chip[data-other]');if(oth)oth.setAttribute('aria-pressed',String(a>0&&!chips.some(c=>+c.dataset.amt===a)));
  const hasBank=!!(S.bankDetails||'').trim();
- $('#go').textContent=mode==='online'?(a>0?`Give ${fmt(a)} with Paystack`:'Give with Paystack'):(hasBank?'I have noted the details':'Request bank details');
+ $('#go').innerHTML=mode==='online'?(a>0?`Give ${fmtH(a)} with Paystack`:'Give with Paystack'):(hasBank?'I have noted the details':'Request bank details');
  $('#amtl').innerHTML=mode==='online'?'Amount':'Amount you plan to give <small>(optional)</small>';
  $('#pm-online').hidden=mode!=='online';$('#pm-bank').hidden=mode!=='bank';
  $('#bankbox').hidden=!hasBank;$('#bankbox').textContent=S.bankDetails||'';
