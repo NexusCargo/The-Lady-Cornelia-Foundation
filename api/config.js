@@ -1,7 +1,10 @@
 module.exports = (req, res) => {
   const e = process.env;
   const pick = (...names) => {
-    for (const n of names) if (e[n] && String(e[n]).trim()) return String(e[n]).trim();
+    for (const n of names) if (e[n]) {
+        const v = String(e[n]).replace(/^[\s'"]+|[\s'",;]+$/g, '');
+        if (v) return v;
+      }
     return '';
   };
   const cfg = {

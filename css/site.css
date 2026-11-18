@@ -65,7 +65,7 @@ nav a:hover{color:var(--pink)}
 .duo{position:relative}
 .duo .arch{aspect-ratio:612/852;background:#fff}
 .duo .arch img{object-position:100% 50%}
-.founder blockquote{margin:1.6em 0 0;padding-left:22px;border-left:4px solid var(--pink-soft);font-family:"Cormorant Garamond",serif;font-size:1.6rem;font-style:italic;line-height:1.3;color:var(--deep)}
+.founder blockquote{margin:1.6em 0 0;font-family:"Cormorant Garamond",serif;font-size:1.6rem;font-style:italic;line-height:1.3;color:var(--deep)}
 @media(min-width:861px){.founder .duo{order:2}}
 @media(max-width:860px){.founder .wrap{grid-template-columns:1fr}.duo{max-width:420px;margin-bottom:30px}}
 
@@ -205,8 +205,7 @@ nav a[aria-current="page"]{color:var(--pink)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .inv{--glass-line:rgba(255,255,255,.16)}}
 :root[data-theme="dark"] .inv{--glass-line:rgba(255,255,255,.16)}
 
-.founder .duo{padding:0 22px 22px 0}
-.founder .duo::before{content:"";position:absolute;inset:22px 0 0 22px;border:3px solid var(--pink);border-radius:999px 999px 32px 32px;opacity:.75}
+.founder .duo{padding:0}
 .founder .duo::after{content:"";position:absolute;right:-18px;top:14%;width:96px;height:96px;border-radius:50%;background:radial-gradient(circle,var(--pink-soft),transparent 70%);opacity:.7;filter:blur(2px)}
 .founder .duo .arch{position:relative;z-index:1;aspect-ratio:4/5;border:9px solid var(--surface);border-radius:999px 999px 28px 28px;-webkit-mask-image:none;mask-image:none;box-shadow:0 26px 50px -24px rgba(61,18,48,.55)}
 .founder .duo .arch img{border-radius:inherit}
