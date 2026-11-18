@@ -1,10 +1,12 @@
 import {ICONS,DEFAULT_SETTINGS,DEFAULT_SLIDES,DEFAULT_PILLARS,DEFAULT_PROGRAMMES,DEFAULT_GALLERY} from './defaults.js';
 
-const SEL='.arch img';
+const SEL='.arch img,.pol img';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const paras=t=>String(t||'').split(/\n{2,}/).map(p=>p.trim()).filter(Boolean).map(p=>`<p>${esc(p)}</p>`).join('');
 const byOrder=(a,b)=>(a.order??0)-(b.order??0);
+const used=new Set();
+const fresh=u=>{if(!u||used.has(u))return false;used.add(u);return true};
 const okMail=e=>/^\S+@\S+\.\S+$/.test(e);
 const fmt=n=>'GH₵'+(+n).toLocaleString('en-GH',{minimumFractionDigits:Number.isInteger(+n)?0:2,maximumFractionDigits:2});
 
@@ -53,20 +55,15 @@ function renderPillars(list){
 }
 function renderProgrammes(list){
  programmes=list;
- $('#programmeList').innerHTML=list.map((p,i)=>{
-  const g=(p.gallery||[]).slice(0,4),n=g.length;
-  const cls=n>=4?'m4':n===3?'m3':n===2?(i%2?'mtall':'m2'):'m1';
-  return `<article class="pg${i%2?' flip':''}"><div class="pg-txt"><h3>${esc(p.title)}</h3>${paras(p.body)}</div><div class="pg-media ${cls}">${g.map(m=>flipCard(m,p.title,firstSentence(p.body))).join('')}</div></article>`;
- }).join('');
+ $('#programmeList').innerHTML=`<div class="pcards">${list.map((p,i)=>`<article class="pcard"><span class="num">${String(i+1).padStart(2,'0')}</span><h3>${esc(p.title)}</h3>${paras(p.body)}<a href="#gallery">See the photos</a></article>`).join('')}</div>`;
  $('#dfor').innerHTML='<option value="General">Where it is needed most</option>'+list.map(p=>`<option>${esc(p.title)}</option>`).join('');
 }
-
-const CH=['One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten'];
 function renderGallery(list){
  $('#gallery').hidden=!list.length;
  $('#galleryList').innerHTML=list.map((c,i)=>{
-  const g=(c.gallery||[]).slice(0,8);
-  return `<article class="ch"><div class="ch-head"><div><span class="kick">Chapter ${CH[i]||i+1}</span><h3>${esc(c.title)}</h3></div>${paras(c.body)}</div><div class="ch-grid g${Math.min(g.length,7)}">${g.map(m=>flipCard(m,c.title)).join('')}</div></article>`;
+  const g=(c.gallery||[]).filter(m=>fresh(m.url)).slice(0,8);
+  const pics=g.map(m=>`<figure class="pol"><img src="${esc(m.url)}" alt="${esc(m.alt||m.caption||c.title)}" loading="lazy">${m.caption?`<figcaption>${esc(m.caption)}</figcaption>`:''}</figure>`).join('');
+  return `<article class="scatter${i%2?' alt':''}"><div class="note"><span class="kick">Project ${String(i+1).padStart(2,'0')}</span><h3>${esc(c.title)}</h3>${paras(c.body)}</div>${pics}</article>`;
  }).join('');
 }
 
@@ -80,6 +77,7 @@ function ssGo(n){
 function ssStop(){clearInterval(SS.timer);SS.timer=null}
 function ssStart(){ssStop();if(!SS.held&&SS.slides.length>1)SS.timer=setInterval(()=>ssGo(SS.i+1),Math.max(2,+S.slideSeconds||5.5)*1000)}
 function renderSlides(list){
+ list=list.filter(s=>fresh(s.image));
  $('#slides').innerHTML=list.map((s,k)=>`<div class="slide" data-caption="${esc(s.caption||'')}"><img src="${esc(s.image)}" alt="${esc(s.alt||s.caption||'')}" style="object-position:${esc(s.pos||'50% 50%')}"${k?' loading="lazy"':''}></div>`).join('');
  SS.slides=$$('#slides .slide');
  ssGo(0);ssStart();
@@ -197,7 +195,7 @@ $('#df').addEventListener('submit',e=>{
  mode==='online'?payOnline(n,m,a,p):bankFlow(n,m,a,p);
 });
 
-function applyAll(slides,pillars,progs,gallery){renderText();renderSlides(slides);renderPillars(pillars);renderProgrammes(progs);renderGallery(gallery)}
+function applyAll(slides,pillars,progs,gallery){renderText();used.clear();used.add(S.founderPhoto);if(S.nextOn&&S.nextImage)used.add(S.nextImage);renderSlides(slides);renderPillars(pillars);renderProgrammes(progs);renderGallery(gallery)}
 applyAll(DEFAULT_SLIDES,DEFAULT_PILLARS,DEFAULT_PROGRAMMES,DEFAULT_GALLERY);
 if(fb&&!/REPLACE/.test(fb.apiKey)){
  try{
