@@ -16,7 +16,7 @@ const fb=window.LCF_CONFIG?.firebase;
 
 function renderText(){
  $('#mission').textContent=S.mission;$('#vision').textContent=S.vision;
- $('#supportIntro').textContent=S.supportIntro;$('#programmesIntro').textContent=S.programmesIntro;
+ $('#supportIntro').textContent=S.supportIntro;
  $('#founderName').textContent=S.founderName;$('#founderRole').textContent=S.founderRole;
  $('#founderBio').innerHTML=paras(S.founderBio);$('#founderQuote').textContent=S.founderQuote;
  const ph=$('#founderPhoto');if(S.founderPhoto&&ph.getAttribute('src')!==S.founderPhoto)ph.src=S.founderPhoto;
@@ -52,11 +52,11 @@ function renderPillars(list){
 }
 function renderProgrammes(list){
  programmes=list;
- $('#programmeList').innerHTML=`<div class="pcards">${list.map((p,i)=>`<article class="pcard"><span class="num">${String(i+1).padStart(2,'0')}</span><h3>${esc(p.title)}</h3>${paras(p.body)}<a href="#gallery">See the photos</a></article>`).join('')}</div>`;
+ $('#programmeList').innerHTML=`${list.map((p,i)=>`<article class="pcard"><span class="num">${String(i+1).padStart(2,'0')}</span><h3>${esc(p.title)}</h3>${paras(p.body)}</article>`).join('')}`;
  $('#dfor').innerHTML='<option value="General">Where it is needed most</option>'+list.map(p=>`<option>${esc(p.title)}</option>`).join('');
 }
 function renderGallery(list){
- const sets=list.map(c=>(c.gallery||[]).filter(m=>fresh(m.url)).slice(0,8)),out=[];
+ const seen=new Set(),sets=list.map(c=>(c.gallery||[]).filter(m=>m.url&&!seen.has(m.url)&&seen.add(m.url)).slice(0,8)),out=[];
  for(let i=0;sets.some(s=>i<s.length);i++)sets.forEach(s=>s[i]&&out.push(s[i]));
  $('#galleryList').innerHTML=out.map(m=>`<figure class="pol"><img src="${esc(m.url)}" alt="${esc(m.alt||m.caption||'Photo from our projects')}" loading="lazy"></figure>`).join('');
 }
@@ -99,10 +99,10 @@ document.addEventListener('visibilitychange',()=>{document.hidden?ssStop():ssSta
 const hv=$('#homeView'),gv=$('#galleryView');
 let inGallery=false;
 function route(first){
- const h=decodeURIComponent(location.hash||''),g=h==='#gallery'||h.startsWith('#g-'),switched=g!==inGallery;
+ const h=decodeURIComponent(location.hash||''),g=h==='#story'||h==='#gallery',switched=g!==inGallery;
  inGallery=g;gv.hidden=!g;hv.hidden=g;
- $$('header nav a').forEach(a=>a.getAttribute('href')==='#gallery'&&(g?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current')));
- const beh=switched?'instant':'smooth',el=h.length>1&&h!=='#top'&&h!=='#gallery'?document.getElementById(h.slice(1)):null;
+ $$('header nav a').forEach(a=>a.getAttribute('href')==='#story'&&(g?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current')));
+ const beh=switched?'instant':'smooth',el=h.length>1&&h!=='#top'&&!g?document.getElementById(h.slice(1)):null;
  if(el)el.scrollIntoView({behavior:beh});else if(!first||switched)window.scrollTo({top:0,behavior:beh});
 }
 addEventListener('hashchange',()=>route(false));

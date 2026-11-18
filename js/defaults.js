@@ -14,7 +14,6 @@ export const DEFAULT_SETTINGS = {
   mission: 'To support, empower and create opportunities for women, widows and the less privileged in our communities.',
   vision: 'A society where every woman and family has access to support, hope and sustainable opportunities.',
   supportIntro: 'Four areas of work, one goal: women and families who can stand on their own.',
-  programmesIntro: 'Health, dignity and a meal when it is needed most. These are some of the projects our volunteers have carried out in the community.',
   founderName: 'Cornelia Kafui Djordjormey',
   founderRole: 'Founder, The Lady Cornelia Foundation',
   founderBio: 'The Lady Cornelia Foundation, led by Cornelia Kafui Djordjormey, began with a simple belief: a community grows stronger when its women are supported. Cornelia leads that work from the front, standing with women, widows and families at every outreach.\n\nFrom free breast cancer screenings and sanitary pad donations to the Street Feeding Project and education support, every programme is built around listening first and then acting with care.',
@@ -29,9 +28,10 @@ export const DEFAULT_SETTINGS = {
   slideSeconds: 6
 };
 export const DEFAULT_SLIDES = [
-  {title:'', text:'', image:'assets/outreach-blazer.jpg', alt:'The founder with a volunteer usher at an outreach event', pos:'50% 30%', order:1, published:true},
-  {title:'Hope. Fight. Cure.', text:'Free breast cancer screening, blood pressure checks and honest talk about early detection, taken to where women already gather.', image:'assets/screening-banner.jpg', alt:'The founder with a volunteer in front of the breast cancer awareness banner', pos:'50% 45%', order:2, published:true},
-  {title:'Dignity should never depend on what a family can afford.', text:'From sanitary pads to street meals, our volunteers show up hand to hand, one pack and one plate at a time.', image:'assets/outreach-venue.jpg', alt:'The founder and volunteers with a young girl at an outreach venue', pos:'50% 35%', order:3, published:true}
+  {title:'Hope. Fight. Cure.', text:'Free breast cancer screening, blood pressure checks and honest talk about early detection, taken to where women already gather.', image:'assets/screening-banner.jpg', alt:'The founder with a volunteer in front of the breast cancer awareness banner', pos:'50% 45%', order:1, published:true},
+  {title:'Dignity should never depend on what a family can afford.', text:'Our volunteers carry sanitary pads to girls and women in the community, hand to hand and pack by pack.', image:'assets/pads-community.jpg', alt:'Volunteers and women of the community holding up packs of sanitary pads', pos:'50% 40%', order:2, published:true},
+  {title:'One plate at a time.', text:'Under the banner Love for the Street, our volunteers serve a hot meal and a kind word to people living on the streets.', image:'assets/street-feeding.jpg', alt:'Volunteers and community members behind the Street Feeding Project frame', pos:'50% 40%', order:3, published:true},
+  {title:'Care for widows and the aged.', text:'Practical help and dignity for those who have lost a provider, so no one is left to cope alone.', image:'assets/gallery-community-gathering.jpg', alt:'Women and girls in colourful dresses gathered along a roadside', pos:'50% 40%', order:4, published:true}
 ];
 export const DEFAULT_PILLARS = [
   {title:'Women empowerment', text:'Skills, mentorship and opportunities that help women lead.', icon:'empower', order:1, published:true},
@@ -43,7 +43,7 @@ export const DEFAULT_PROGRAMMES = [
   {title:'Breast cancer awareness and free screening', body:'Each year our volunteers set up in the open air, check blood pressure, talk through early detection and offer screening at no cost. Early awareness saves lives.', gallery:[], order:1, published:true},
   {title:'Lady Cornelia Donates Sanitary Pads', body:'Our volunteers bring sanitary pads straight to girls and women in the community, because dignity during her period should never depend on what a family can afford.', gallery:[], order:2, published:true},
   {title:'Street Feeding Project', body:'Under the banner Love for the Street, our volunteers go out to people living on the streets and serve them a meal with a kind word. It is our way of serving humanity, one plate at a time.', gallery:[], order:3, published:true},
-  {title:'Where the road ends, we keep going', body:'Some of the families who need us most live beyond the end of the road. So our volunteers put on life jackets, board the canoes and cross the water, carrying supplies to the people waiting on the other side.', gallery:[], order:4, published:true}
+  {title:'Care for widows and the aged', body:'Practical help and dignity for widows and the aged in our communities, because no one should be left to cope alone after losing a provider.', gallery:[], order:4, published:true}
 ];
 export const DEFAULT_GALLERY = [
   {title:'Breast cancer awareness and free screening', body:'Every year our volunteers take the conversation to where women already gather: pink T-shirts, open-air tents, free blood pressure checks and honest talk about early detection. Hope, Fight, Cure is more than words on a shirt. It is how we show up.', gallery:[

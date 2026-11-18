@@ -57,14 +57,14 @@ function pickFile(cb){const i=document.createElement('input');i.type='file';i.ac
 const ICON_OPTS=Object.keys(ICONS);
 const C={
  slides:{label:'Hero slides',single:'slide',def:DEFAULT_SLIDES,fields:[
-  {k:'image',t:'image',label:'Photo',req:1,full:1},{k:'title',t:'text',label:'Headline (blank uses the site headline)',full:1},{k:'text',t:'textarea',label:'Paragraph (blank uses the site paragraph)',rows:3,full:1},{k:'alt',t:'text',label:'Photo description',full:1},
+  {k:'image',t:'image',label:'Photo',req:1,full:1},{k:'title',t:'text',label:'Headline',full:1},{k:'text',t:'textarea',label:'Paragraph',rows:3,full:1},{k:'alt',t:'text',label:'Photo description',full:1},
   {k:'pos',t:'pos',label:'Focus point',full:1},{k:'order',t:'number',label:'Order'},{k:'published',t:'check',label:'Show on website',def:true}],
   title:i=>i.title||'Main headline',thumb:i=>i.image,meta:i=>''},
- programmes:{label:'Programmes',single:'programme',def:DEFAULT_PROGRAMMES,fields:[
+ programmes:{label:'Story projects',single:'programme',def:DEFAULT_PROGRAMMES,fields:[
   {k:'title',t:'text',label:'Title',req:1,full:1},{k:'body',t:'textarea',label:'Description',rows:6,full:1},
   {k:'order',t:'number',label:'Order'},{k:'published',t:'check',label:'Show on website',def:true}],
   title:i=>i.title,thumb:null,icon:i=>`<b>${i.order||''}</b>`,meta:i=>(i.body||'').slice(0,70)},
- gallery:{label:'Gallery',single:'project',def:DEFAULT_GALLERY,fields:[
+ gallery:{label:'Story photos',single:'project',def:DEFAULT_GALLERY,fields:[
   {k:'title',t:'text',label:'Project name',req:1,full:1},{k:'gallery',t:'gallery',label:'Photos (up to 8)',full:1,max:8},
   {k:'order',t:'number',label:'Order'},{k:'published',t:'check',label:'Show on website',def:true}],
   title:i=>i.title,thumb:i=>i.gallery?.[0]?.url,meta:i=>`${(i.gallery||[]).length} photo(s)`},
@@ -75,7 +75,7 @@ const C={
 };
 const SET_GROUPS=[
  ['Next project banner',[['nextOn','check','Show the banner on the website'],['nextTitle','text','Project name'],['nextDate','date','Date'],['nextTime','text','Time (for example 9:00 AM)'],['nextPlace','text','Place'],['nextText','textarea','Short description',4],['nextImage','image','Photo (optional)'],['nextCta','text','Button text'],['nextLink','text','Button link (leave empty to open the donate form)']]],
- ['Hero & intro',[['heroTitle','text','Hero headline'],['heroLead','textarea','Hero paragraph'],['slideSeconds','number','Seconds per hero slide'],['mission','textarea','Mission'],['vision','textarea','Vision'],['supportIntro','text','“What we support” intro'],['programmesIntro','textarea','“Our programmes” intro']]],
+ ['Hero & intro',[['heroTitle','text','Hero headline'],['heroLead','textarea','Hero paragraph'],['slideSeconds','number','Seconds per hero slide'],['mission','textarea','Mission'],['vision','textarea','Vision'],['supportIntro','text','“What we support” intro']]],
  ['Founder',[['founderName','text','Name'],['founderRole','text','Role line'],['founderBio','textarea','Biography',8],['founderQuote','text','Quote'],['founderPhoto','image','Portrait photo']]],
  ['Contact & footer',[['tagline','text','Footer tagline'],['email','text','Foundation email'],['phone','text','Phone'],['facebook','text','Facebook URL'],['instagram','text','Instagram URL'],['tiktok','text','TikTok URL'],['x','text','X / Twitter URL']]],
  ['Giving',[['paystackKey','text','Paystack public key'],['amounts','text','Quick amounts (GH₵, comma separated)'],['bankDetails','textarea','Bank transfer details',5]]]
@@ -225,7 +225,7 @@ async function showDash(){
 }
 async function refreshBadge(){try{const n=(await all('inquiries')).filter(i=>i.status==='new').length;const b=document.querySelector('#nav [data-v=inbox] .pill');if(b){b.textContent=n;b.hidden=!n}}catch(_){}}
 
-const VIEWS={dash:['Dashboard',showDash],slides:['Hero slides',()=>showCollection('slides')],programmes:['Programmes',()=>showCollection('programmes')],gallery:['Gallery',()=>showCollection('gallery')],pillars:['What we support',()=>showCollection('pillars')],settings:['Site settings',showSettings],donations:['Donations',showDonations],inbox:['Messages','']};
+const VIEWS={dash:['Dashboard',showDash],slides:['Hero slides',()=>showCollection('slides')],programmes:['Story projects',()=>showCollection('programmes')],gallery:['Story photos',()=>showCollection('gallery')],pillars:['What we support',()=>showCollection('pillars')],settings:['Site settings',showSettings],donations:['Donations',showDonations],inbox:['Messages','']};
 VIEWS.inbox=['Messages',showInbox];
 function go(v){
  document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-current',String(b.dataset.v===v)));

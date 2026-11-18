@@ -17,7 +17,7 @@
 <header>
  <div class="wrap">
   <a href="#top" aria-label="The Lady Cornelia Foundation home"><span class="brand" role="img" aria-label="The Lady Cornelia Foundation"></span></a>
-  <nav aria-label="Main"><a href="#about">About</a><a href="#support">What we support</a><a href="#programmes">Programmes</a><a href="#gallery">Gallery</a><a href="#founder">Our founder</a><a href="#involved">Get involved</a></nav>
+  <nav aria-label="Main"><a href="#about">About</a><a href="#support">What we support</a><a href="#story">Our story</a><a href="#founder">Our founder</a><a href="#involved">Get involved</a></nav>
   <button class="btn" data-open="donate">Donate</button>
  </div>
 </header>
@@ -58,13 +58,6 @@
  </div>
 </section>
 
-<section class="prog" id="programmes">
- <div class="wrap">
-  <div class="head"><h2>Our programmes</h2><p id="programmesIntro"></p></div>
-  <div id="programmeList"></div>
- </div>
-</section>
-
 <section class="founder" id="founder">
  <div class="wrap">
   <div class="duo"><div class="arch"><img id="founderPhoto" alt="Portrait of the founder" loading="lazy"></div></div>
@@ -79,7 +72,7 @@
 
 <section class="inv" id="involved">
  <div class="wrap">
-  <div class="head"><h2>Get involved</h2><p>There is a place for you in this work. Choose how you would like to help.</p></div>
+  <div class="head"><h2>Get involved</h2></div>
   <div class="cards">
    <div class="card"><h3>Donate</h3><p>Your gift funds screenings, sanitary pads, street meals, school support and care for widows and orphans.</p><button class="link" data-open="donate">Give today</button></div>
    <div class="card"><h3>Volunteer</h3><p>Give your time and skills at our outreach events and community projects.</p><button class="link" data-open="join" data-type="volunteer" data-title="Volunteer with us">Join the team</button></div>
@@ -91,10 +84,11 @@
 </div>
 
 <div id="galleryView" hidden>
-<section class="gal" id="gallery">
+<section class="gal" id="story">
  <div class="wrap">
   <a class="back" href="#top">← Back to home</a>
-  <h2>Gallery</h2>
+  <h2>Our story</h2>
+  <div class="pcards" id="programmeList"></div>
   <div class="masonry" id="galleryList"></div>
  </div>
 </section>
@@ -115,7 +109,7 @@
 
 <dialog id="donate" aria-labelledby="dt"><div class="dlg">
 <button class="x" data-close aria-label="Close">×</button>
-<div id="dform"><h3 id="dt">Give to a woman’s future</h3><p class="sub">Your gift funds free screenings, sanitary pads, street meals, school support and care for widows and orphans. Give any amount you like.</p>
+<div id="dform"><h3 id="dt">Give to a woman’s future</h3><p class="sub">Your gift funds free screenings, sanitary pads, street meals, school support and care for widows and orphans.</p>
 <form id="df" novalidate>
 <div class="seg" role="tablist" aria-label="How would you like to give?"><button type="button" role="tab" data-mode="online" aria-selected="true">Pay online</button><button type="button" role="tab" data-mode="bank" aria-selected="false">Bank transfer</button></div>
 <label for="amt" id="amtl">Amount</label>
@@ -133,8 +127,7 @@
 
 <dialog id="join" aria-labelledby="jt"><div class="dlg">
 <button class="x" data-close aria-label="Close">×</button>
-<div id="jform"><h3 id="jt">Volunteer with us</h3><p class="sub">Tell us a little about you and we will be in touch.</p>
-<form id="jf" novalidate>
+<div id="jform"><h3 id="jt">Volunteer with us</h3><form id="jf" novalidate>
 <label for="jn">Full name</label><input id="jn" autocomplete="name">
 <div class="row2"><div><label for="je">Email</label><input id="je" type="email" autocomplete="email"></div><div><label for="jp">Phone <small>(optional)</small></label><input id="jp" type="tel" autocomplete="tel"></div></div>
 <label for="jm">How would you like to help?</label><textarea id="jm" rows="3" maxlength="1500"></textarea>
