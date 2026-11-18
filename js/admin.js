@@ -159,6 +159,9 @@ function openForm(title,fields,values,onSave){
  m.showModal();
 }
 
+async function seedCollection(n){
+ const bt=writeBatch(db);C[n].def.forEach(d=>bt.set(doc(collection(db,n)),{...d,createdAt:serverTimestamp()}));await bt.commit();
+}
 async function showCollection(name){
  const cfg=C[name];setHead(cfg.label,`<button class="btn" id="add">+ Add ${cfg.single}</button>`);
  view.innerHTML='<p class="empty">Loading…</p>';
@@ -167,7 +170,8 @@ async function showCollection(name){
   ${cfg.thumb?`<img class="th" src="${esc(cfg.thumb(it))}" alt="">`:`<div class="th">${cfg.icon(it)}</div>`}
   <div><h3>${esc(cfg.title(it))}</h3><p><span class="tag ${it.published?'ok':'warn'}">${it.published?'Live':'Hidden'}</span> ${esc(cfg.meta(it)||'')}</p></div>
   <div class="acts"><button class="btn ghost sm" data-a="up" ${i?'':'disabled'}>▲</button><button class="btn ghost sm" data-a="down" ${i<items.length-1?'':'disabled'}>▼</button><button class="btn ghost sm" data-a="pub">${it.published?'Hide':'Show'}</button><button class="btn sm" data-a="edit">Edit</button><button class="btn danger sm" data-a="del">Delete</button></div></div>`).join('')}</div>`
-  :`<div class="card empty">Nothing here yet.</div>`);
+  :`<div class="card empty">Nothing here yet.<br><br><button class="btn" id="seedc">Load starter ${esc(cfg.label.toLowerCase())}</button></div>`);
+ const sc=$('#seedc');if(sc)sc.onclick=async()=>{sc.disabled=true;sc.textContent='Loading…';await seedCollection(name);toast('Starter content loaded');showCollection(name)};
  const save=async(it,data)=>{it?await updateDoc(doc(db,name,it.id),{...data,updatedAt:serverTimestamp()}):await addDoc(collection(db,name),{...data,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});toast('Saved');showCollection(name)};
  $('#add').onclick=()=>openForm('Add '+cfg.single,cfg.fields,{order:(items.at(-1)?.order||0)+1},d=>save(null,d));
  view.onclick=async e=>{
@@ -193,7 +197,7 @@ async function showSettings(){
  $('#sv').onclick=async()=>{await setDoc(doc(db,'settings','site'),{...collect(fields,view),updatedAt:serverTimestamp()},{merge:true});toast('Settings saved')};
  $('#seed').onclick=async()=>{
   if(!confirm('Load default content?'))return;
-  for(const n of ['slides','programmes','pillars','gallery'])if(!(await all(n)).length){const bt=writeBatch(db);C[n].def.forEach(d=>bt.set(doc(collection(db,n)),{...d,createdAt:serverTimestamp()}));await bt.commit()}
+  for(const n of ['slides','programmes','pillars','gallery'])if(!(await all(n)).length)await seedCollection(n);
   await setDoc(doc(db,'settings','site'),{...DEFAULT_SETTINGS,...(snap.exists()?snap.data():{}),seeded:true},{merge:true});toast('Default content loaded');showSettings();
  };
 }
@@ -233,9 +237,16 @@ async function showDash(){
  ok.forEach(d=>{const t=(d.paidAt||d.createdAt)?.toDate?.();if(!t)return;const m=months.find(x=>x.k===t.getFullYear()+'-'+t.getMonth());if(m)m.v+=+d.amount||0});
  const mx=Math.max(1,...months.map(m=>m.v)),unread=inq.filter(i=>i.status==='new').length;
  const recent=ok.sort((a,b)=>(b.paidAt?.seconds||0)-(a.paidAt?.seconds||0)).slice(0,5);
- view.innerHTML=`<div class="stats"><div class="card stat"><b>${fmt(total)}</b><span>Total raised</span></div><div class="card stat"><b>${ok.length}</b><span>Gifts received</span></div><div class="card stat"><b>${unread}</b><span>Unread messages</span></div><div class="card stat"><b>${sl.filter(s=>s.published).length}</b><span>Live hero slides</span></div><div class="card stat"><b>${pr.filter(s=>s.published).length}</b><span>Live programmes</span></div></div>
+ view.innerHTML=(!sl.length&&!pr.length?`<div class="card empty" style="margin-bottom:18px">Your website content is empty.<br><br><button class="btn" id="seedall">Load starter content</button></div>`:'')+`<div class="stats"><div class="card stat"><b>${fmt(total)}</b><span>Total raised</span></div><div class="card stat"><b>${ok.length}</b><span>Gifts received</span></div><div class="card stat"><b>${unread}</b><span>Unread messages</span></div><div class="card stat"><b>${sl.filter(s=>s.published).length}</b><span>Live hero slides</span></div><div class="card stat"><b>${pr.filter(s=>s.published).length}</b><span>Live programmes</span></div></div>
  <div class="grid2"><div class="card"><h3>Giving, last 6 months</h3><div class="bars">${months.map(m=>`<div><i style="height:${Math.round(m.v/mx*100)}%" title="${fmt(m.v)}"></i>${m.l}</div>`).join('')}</div></div>
  <div class="card"><h3>Latest gifts</h3>${recent.length?recent.map(d=>`<p style="margin:.6em 0"><b>${fmt(d.amount)}</b> · ${esc(d.name||'Anonymous')}<br><small style="color:var(--muted)">${esc(d.designation||'General')} · ${when(d.paidAt)}</small></p>`).join(''):'<p class="empty">No gifts yet.</p>'}</div></div>`;
+ const sa=$('#seedall');if(sa)sa.onclick=async()=>{
+  sa.disabled=true;sa.textContent='Loading…';
+  for(const n of ['slides','programmes','pillars','gallery'])if(!(await all(n)).length)await seedCollection(n);
+  const snap=await getDoc(doc(db,'settings','site'));
+  await setDoc(doc(db,'settings','site'),{...DEFAULT_SETTINGS,...(snap.exists()?snap.data():{}),seeded:true},{merge:true});
+  toast('Starter content loaded');showDash();
+ };
 }
 async function refreshBadge(){try{const n=(await all('inquiries')).filter(i=>i.status==='new').length;const b=document.querySelector('#nav [data-v=inbox] .pill');if(b){b.textContent=n;b.hidden=!n}}catch(_){}}
 
@@ -243,7 +254,7 @@ const VIEWS={dash:['Dashboard',showDash],slides:['Hero slides',()=>showCollectio
 VIEWS.inbox=['Messages',showInbox];
 function go(v){
  document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-current',String(b.dataset.v===v)));
- $('aside').classList.remove('open');history.replaceState(null,'','#'+v);view.onclick=view.onchange=null;
+ $('aside').classList.remove('open');history.replaceState(null,'','#'+v);view.onclick=view.onchange=null;window.scrollTo(0,0);
  VIEWS[v][1]().catch(e=>{console.error(e);view.innerHTML=`<div class="card"><b>Something went wrong.</b><p>${esc(e.message)}</p></div>`});
 }
 function start(){
