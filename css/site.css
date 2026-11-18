@@ -267,3 +267,7 @@ figure.fcard{cursor:pointer}
  .pol:nth-of-type(3n){grid-column:span 2}
 }
 @media(prefers-reduced-motion:reduce){.pol{transition:none}}
+
+.gsort{max-width:340px;margin:0 0 6px}
+.gal .seg{background:var(--surface)}
+.scatter{scroll-margin-top:90px}

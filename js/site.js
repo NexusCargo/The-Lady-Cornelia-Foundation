@@ -53,19 +53,30 @@ const flipCard=(m,kick,note)=>`<figure class="fcard" tabindex="0" role="group" a
 function renderPillars(list){
  $('#pillars').innerHTML=list.map(p=>`<div class="pillar"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[p.icon]||ICONS.heart}</svg><h3>${esc(p.title)}</h3><p>${esc(p.text)}</p></div>`).join('');
 }
+const slug=t=>String(t||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const stamp=c=>{const t=c.updatedAt;return t?.toDate?t.toDate().getTime():t?new Date(t).getTime()||0:0};
+let galData=[],galSort='name';
 function renderProgrammes(list){
  programmes=list;
- $('#programmeList').innerHTML=`<div class="pcards">${list.map((p,i)=>`<article class="pcard"><span class="num">${String(i+1).padStart(2,'0')}</span><h3>${esc(p.title)}</h3>${paras(p.body)}<a href="#gallery">See the photos</a></article>`).join('')}</div>`;
+ $('#programmeList').innerHTML=`<div class="pcards">${list.map((p,i)=>`<article class="pcard" data-slug="${slug(p.title)}"><span class="num">${String(i+1).padStart(2,'0')}</span><h3>${esc(p.title)}</h3>${paras(p.body)}<a href="#gallery">See the photos</a></article>`).join('')}</div>`;
  $('#dfor').innerHTML='<option value="General">Where it is needed most</option>'+list.map(p=>`<option>${esc(p.title)}</option>`).join('');
 }
 function renderGallery(list){
- $('#gallery').hidden=!list.length;
- $('#galleryList').innerHTML=list.map((c,i)=>{
-  const g=(c.gallery||[]).filter(m=>fresh(m.url)).slice(0,8);
-  const pics=g.map(m=>`<figure class="pol"><img src="${esc(m.url)}" alt="${esc(m.alt||m.caption||c.title)}" loading="lazy">${m.caption?`<figcaption>${esc(m.caption)}</figcaption>`:''}</figure>`).join('');
-  return `<article class="scatter${i%2?' alt':''}"><div class="note"><span class="kick">Project ${String(i+1).padStart(2,'0')}</span><h3>${esc(c.title)}</h3>${paras(c.body)}</div>${pics}</article>`;
- }).join('');
+ galData=list.map(c=>({...c,gallery:(c.gallery||[]).filter(m=>fresh(m.url)).slice(0,8)}));
+ drawGallery();
 }
+function drawGallery(){
+ const l=galData.slice().sort(galSort==='date'?(a,b)=>stamp(b)-stamp(a)||(a.order??0)-(b.order??0):(a,b)=>String(a.title).localeCompare(String(b.title)));
+ $('#gallery').hidden=!l.length;
+ $$('.gsort button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.sort===galSort)));
+ $('#galleryList').innerHTML=l.map((c,i)=>{
+  const t=stamp(c),kick=t?'Updated '+new Date(t).toLocaleDateString('en-GB',{month:'long',year:'numeric'}):'Project';
+  const pics=c.gallery.map(m=>`<figure class="pol"><img src="${esc(m.url)}" alt="${esc(m.alt||m.caption||c.title)}" loading="lazy">${m.caption?`<figcaption>${esc(m.caption)}</figcaption>`:''}</figure>`).join('');
+  return `<article class="scatter${i%2?' alt':''}" id="g-${slug(c.title)}"><div class="note"><span class="kick">${kick}</span><h3>${esc(c.title)}</h3>${paras(c.body)}</div>${pics}</article>`;
+ }).join('');
+ $$('.pcard').forEach(a=>{const el=document.getElementById('g-'+a.dataset.slug),k=a.querySelector('a');if(el){const n=el.querySelectorAll('.pol').length;k.href='#g-'+a.dataset.slug;k.textContent=`See ${n} photo${n===1?'':'s'}`}else k.href='#gallery'});
+}
+document.addEventListener('click',e=>{const b=e.target.closest('.gsort button');if(b){galSort=b.dataset.sort;drawGallery()}});
 
 const SS={i:0,timer:null,held:false,slides:[]};
 const root=$('.arch-wrap'),badge=root.querySelector('.badge');
