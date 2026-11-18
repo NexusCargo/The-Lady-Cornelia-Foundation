@@ -1,5 +1,6 @@
-import {ICONS,DEFAULT_SETTINGS,DEFAULT_SLIDES,DEFAULT_PILLARS,DEFAULT_PROGRAMMES} from './defaults.js';
+import {ICONS,DEFAULT_SETTINGS,DEFAULT_SLIDES,DEFAULT_PILLARS,DEFAULT_PROGRAMMES,DEFAULT_GALLERY} from './defaults.js';
 
+const SEL='.arch img';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const paras=t=>String(t||'').split(/\n{2,}/).map(p=>p.trim()).filter(Boolean).map(p=>`<p>${esc(p)}</p>`).join('');
@@ -14,7 +15,7 @@ const fb=window.LCF_CONFIG?.firebase;
 function renderText(){
  $('#heroTitle').textContent=S.heroTitle;$('#heroLead').textContent=S.heroLead;
  $('#mission').textContent=S.mission;$('#vision').textContent=S.vision;
- $('#supportIntro').textContent=S.supportIntro;$('#programmesIntro').textContent=S.programmesIntro;
+ $('#supportIntro').textContent=S.supportIntro;$('#galleryIntro').textContent=S.galleryIntro;$('#programmesIntro').textContent=S.programmesIntro;
  $('#founderName').textContent=S.founderName;$('#founderRole').textContent=S.founderRole;
  $('#founderBio').innerHTML=paras(S.founderBio);$('#founderQuote').textContent=S.founderQuote;
  const ph=$('#founderPhoto');if(S.founderPhoto&&ph.getAttribute('src')!==S.founderPhoto)ph.src=S.founderPhoto;
@@ -22,8 +23,31 @@ function renderText(){
  const links=[['Facebook',S.facebook],['Instagram',S.instagram],['TikTok',S.tiktok],['X',S.x]].filter(l=>l[1]);
  $('#social').innerHTML=links.map(([n,u])=>`<a href="${esc(u)}" target="_blank" rel="noopener">${n}</a>`).join('');
  $('#chips').innerHTML=String(S.amounts).split(',').map(a=>+a.trim()).filter(a=>a>0).slice(0,5).map(a=>`<button type="button" class="chip" data-amt="${a}">${fmt(a)}</button>`).join('')+'<button type="button" class="chip" data-other>Other</button>';
+ renderNext();
  syncDonate();
 }
+function renderNext(){
+ const box=$('#next'),on=S.nextOn&&String(S.nextTitle||'').trim();
+ let d=null,left=null;
+ if(/^\d{4}-\d{2}-\d{2}$/.test(S.nextDate||'')){const [y,m,dd]=S.nextDate.split('-').map(Number);d=new Date(y,m-1,dd);const t=new Date();left=Math.round((d-new Date(t.getFullYear(),t.getMonth(),t.getDate()))/864e5)}
+ if(!on||(left!==null&&left<0)){box.hidden=true;return}
+ $('#nxTitle').textContent=S.nextTitle;
+ const meta=[];
+ if(left!==null)meta.push([left===0?'Today':left===1?'Tomorrow':`In ${left} days`,'soon']);
+ if(d)meta.push([d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+(S.nextTime?', '+S.nextTime:'')]);
+ else if(S.nextTime)meta.push([S.nextTime]);
+ if(S.nextPlace)meta.push([S.nextPlace]);
+ $('#nxMeta').innerHTML=meta.map(([t,c])=>`<li${c?` class="${c}"`:''}>${esc(t)}</li>`).join('');
+ $('#nxMeta').hidden=!meta.length;
+ $('#nxText').innerHTML=paras(S.nextText);$('#nxText').hidden=!S.nextText;
+ const link=(S.nextLink||'').trim(),cta=(S.nextCta||'').trim()||(link?'Learn more':'Support this project');
+ $('#nxAct').innerHTML=/^https?:\/\//i.test(link)?`<a class="btn" href="${esc(link)}" target="_blank" rel="noopener">${esc(cta)}</a>`:`<button type="button" class="btn" data-open="donate">${esc(cta)}</button>`;
+ const im=$('#nxImg');im.hidden=!S.nextImage;if(S.nextImage)im.querySelector('img').src=S.nextImage;
+ $('.nx-card').classList.toggle('noimg',!S.nextImage);
+ box.hidden=false;
+}
+const firstSentence=t=>String(t||'').trim().split(/(?<=[.!?])\s/)[0];
+const flipCard=(m,kick,note)=>`<figure class="fcard" tabindex="0" role="group" aria-label="${esc(m.caption||kick)}"><div class="fl-in"><div class="fl-f"><img src="${esc(m.url)}" alt="${esc(m.alt||m.caption||kick)}" style="object-position:${esc(m.pos||'50% 50%')}" loading="lazy">${m.caption?`<figcaption>${esc(m.caption)}</figcaption>`:''}</div><div class="fl-b"><span class="kick">${esc(kick)}</span><strong>${esc(m.caption||kick)}</strong>${(m.note||note)?`<p>${esc(m.note||note)}</p>`:''}<button type="button" data-zoom>View photo</button></div></div></figure>`;
 function renderPillars(list){
  $('#pillars').innerHTML=list.map(p=>`<div class="pillar"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[p.icon]||ICONS.heart}</svg><h3>${esc(p.title)}</h3><p>${esc(p.text)}</p></div>`).join('');
 }
@@ -32,34 +56,36 @@ function renderProgrammes(list){
  $('#programmeList').innerHTML=list.map((p,i)=>{
   const g=(p.gallery||[]).slice(0,4),n=g.length;
   const cls=n>=4?'m4':n===3?'m3':n===2?(i%2?'mtall':'m2'):'m1';
-  return `<article class="pg${i%2?' flip':''}"><div class="pg-txt"><h3>${esc(p.title)}</h3>${paras(p.body)}</div><div class="pg-media ${cls}">${g.map(m=>`<figure><img src="${esc(m.url)}" alt="${esc(m.caption||p.title)}" style="object-position:${esc(m.pos||'50% 50%')}" loading="lazy">${m.caption?`<figcaption>${esc(m.caption)}</figcaption>`:''}</figure>`).join('')}</div></article>`;
+  return `<article class="pg${i%2?' flip':''}"><div class="pg-txt"><h3>${esc(p.title)}</h3>${paras(p.body)}</div><div class="pg-media ${cls}">${g.map(m=>flipCard(m,p.title,firstSentence(p.body))).join('')}</div></article>`;
  }).join('');
  $('#dfor').innerHTML='<option value="General">Where it is needed most</option>'+list.map(p=>`<option>${esc(p.title)}</option>`).join('');
 }
 
-const SS={i:0,timer:null,playing:!matchMedia('(prefers-reduced-motion:reduce)').matches,held:false,slides:[],dots:[]};
-const root=$('.arch-wrap'),badge=root.querySelector('.badge'),dotBox=root.querySelector('.ss-dots'),tog=root.querySelector('[data-toggle]'),ctrl=root.querySelector('.ss-controls');
+const CH=['One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten'];
+function renderGallery(list){
+ $('#gallery').hidden=!list.length;
+ $('#galleryList').innerHTML=list.map((c,i)=>{
+  const g=(c.gallery||[]).slice(0,8);
+  return `<article class="ch"><div class="ch-head"><div><span class="kick">Chapter ${CH[i]||i+1}</span><h3>${esc(c.title)}</h3></div>${paras(c.body)}</div><div class="ch-grid g${Math.min(g.length,7)}">${g.map(m=>flipCard(m,c.title)).join('')}</div></article>`;
+ }).join('');
+}
+
+const SS={i:0,timer:null,held:false,slides:[]};
+const root=$('.arch-wrap'),badge=root.querySelector('.badge');
 function ssGo(n){
  const L=SS.slides.length;if(!L)return;SS.i=(n+L)%L;
  const c=SS.slides[SS.i].dataset.caption||'';badge.textContent=c;badge.hidden=!c;
  SS.slides.forEach((s,k)=>{const a=k===SS.i;s.classList.toggle('is-active',a);s.setAttribute('aria-hidden',String(!a));a?s.removeAttribute('inert'):s.setAttribute('inert','')});
- SS.dots.forEach((d,k)=>d.setAttribute('aria-current',String(k===SS.i)));
 }
 function ssStop(){clearInterval(SS.timer);SS.timer=null}
-function ssStart(){ssStop();if(SS.playing&&!SS.held&&SS.slides.length>1)SS.timer=setInterval(()=>ssGo(SS.i+1),Math.max(2,+S.slideSeconds||5.5)*1000)}
-function ssSync(){tog.classList.toggle('paused',!SS.playing);tog.setAttribute('aria-label',SS.playing?'Pause slideshow':'Play slideshow')}
+function ssStart(){ssStop();if(!SS.held&&SS.slides.length>1)SS.timer=setInterval(()=>ssGo(SS.i+1),Math.max(2,+S.slideSeconds||5.5)*1000)}
 function renderSlides(list){
  $('#slides').innerHTML=list.map((s,k)=>`<div class="slide" data-caption="${esc(s.caption||'')}"><img src="${esc(s.image)}" alt="${esc(s.alt||s.caption||'')}" style="object-position:${esc(s.pos||'50% 50%')}"${k?' loading="lazy"':''}></div>`).join('');
- SS.slides=$$('#slides .slide');dotBox.innerHTML='';
- SS.dots=SS.slides.map((_,n)=>{const b=document.createElement('button');b.type='button';b.className='ss-dot';b.setAttribute('aria-label',`Show photo ${n+1} of ${SS.slides.length}`);b.onclick=()=>{ssGo(n);ssStart()};dotBox.appendChild(b);return b});
- ctrl.hidden=SS.slides.length<2;ssGo(0);ssSync();ssStart();
+ SS.slides=$$('#slides .slide');
+ ssGo(0);ssStart();
 }
-root.querySelector('[data-prev]').onclick=()=>{ssGo(SS.i-1);ssStart()};
-root.querySelector('[data-next]').onclick=()=>{ssGo(SS.i+1);ssStart()};
-tog.onclick=()=>{SS.playing=!SS.playing;ssSync();ssStart()};
 root.addEventListener('mouseenter',()=>{SS.held=true;ssStart()});root.addEventListener('mouseleave',()=>{SS.held=false;ssStart()});
 root.addEventListener('focusin',()=>{SS.held=true;ssStart()});root.addEventListener('focusout',()=>{SS.held=false;ssStart()});
-root.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'){ssGo(SS.i-1);ssStart()}if(e.key==='ArrowRight'){ssGo(SS.i+1);ssStart()}});
 let x0=null;
 root.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});
 root.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>40){ssGo(SS.i+(dx<0?1:-1));ssStart()}});
@@ -67,17 +93,21 @@ document.addEventListener('visibilitychange',()=>{document.hidden?ssStop():ssSta
 
 let joinType='volunteer',paying=false;
 document.addEventListener('click',e=>{
+ const z=e.target.closest('[data-zoom]');
+ if(z){const im=z.closest('figure').querySelector('.fl-f img'),l=$('#lb img');l.src=im.src;l.alt=im.alt;$('#lb').showModal();return}
+ const fc=e.target.closest('figure.fcard');
+ if(fc&&!matchMedia('(hover:hover)').matches){fc.classList.toggle('is-flipped');return}
  const o=e.target.closest('[data-open]');
  if(o){const d=$('#'+o.dataset.open);if(o.dataset.title){$('#jt').textContent=o.dataset.title;joinType=o.dataset.type||'volunteer'}d.showModal();return}
- const img=e.target.closest('.arch img,.prog figure img');
+ const img=e.target.closest(SEL);
  if(img){const l=$('#lb img');l.src=img.src;l.alt=img.alt;$('#lb').showModal()}
 });
-document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches?.('.arch img,.prog figure img')){e.preventDefault();e.target.click()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('figure.fcard.is-flipped').forEach(f=>f.classList.remove('is-flipped'));if((e.key==='Enter'||e.key===' ')&&e.target.matches?.(SEL)){e.preventDefault();e.target.click()}});
 $$('dialog').forEach(d=>{
  d.addEventListener('click',e=>{if(e.target===d||e.target.closest('[data-close]'))d.close()});
  d.addEventListener('close',()=>{if(paying)return;$('#dform').hidden=false;$('#dthanks').hidden=true;$('#jform').hidden=false;$('#jthanks').hidden=true});
 });
-new MutationObserver(()=>$$('.arch img,.prog figure img').forEach(i=>{if(!i.tabIndex||i.tabIndex<0){i.tabIndex=0;i.setAttribute('role','button')}})).observe(document.body,{childList:true,subtree:true});
+new MutationObserver(()=>$$(SEL).forEach(i=>{if(!i.tabIndex||i.tabIndex<0){i.tabIndex=0;i.setAttribute('role','button')}})).observe(document.body,{childList:true,subtree:true});
 $('#share').onclick=async()=>{const b=$('#share');try{if(navigator.share)await navigator.share({title:document.title,url:location.href});else{await navigator.clipboard.writeText(location.href);b.textContent='Link copied'}}catch(_){}};
 
 async function saveInquiry(data){
@@ -167,8 +197,8 @@ $('#df').addEventListener('submit',e=>{
  mode==='online'?payOnline(n,m,a,p):bankFlow(n,m,a,p);
 });
 
-function applyAll(slides,pillars,progs){renderText();renderSlides(slides);renderPillars(pillars);renderProgrammes(progs)}
-applyAll(DEFAULT_SLIDES,DEFAULT_PILLARS,DEFAULT_PROGRAMMES);
+function applyAll(slides,pillars,progs,gallery){renderText();renderSlides(slides);renderPillars(pillars);renderProgrammes(progs);renderGallery(gallery)}
+applyAll(DEFAULT_SLIDES,DEFAULT_PILLARS,DEFAULT_PROGRAMMES,DEFAULT_GALLERY);
 if(fb&&!/REPLACE/.test(fb.apiKey)){
  try{
   const V='10.14.1',[{initializeApp},fs]=await Promise.all([import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`),import(`https://www.gstatic.com/firebasejs/${V}/firebase-firestore.js`)]);
@@ -178,6 +208,7 @@ if(fb&&!/REPLACE/.test(fb.apiKey)){
   const [st,sl,pi,pr]=await Promise.all([getDoc(doc(db,'settings','site')),pub('slides'),pub('pillars'),pub('programmes')]);
   if(st.exists())S={...DEFAULT_SETTINGS,...st.data()};
   const pick=(a,d)=>S.seeded||a.length?a:d;
-  applyAll(pick(sl,DEFAULT_SLIDES),pick(pi,DEFAULT_PILLARS),pick(pr,DEFAULT_PROGRAMMES));
+  let gl=[];try{gl=await pub('gallery')}catch(_){}
+  applyAll(pick(sl,DEFAULT_SLIDES),pick(pi,DEFAULT_PILLARS),pick(pr,DEFAULT_PROGRAMMES),gl.length?gl:DEFAULT_GALLERY);
  }catch(e){console.warn('Using default content',e)}
 }

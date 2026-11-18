@@ -25,6 +25,8 @@ export const DEFAULT_SETTINGS = {
   amounts: '50,100,200,500,1000',
   bankDetails: '',
   facebook: '', instagram: '', tiktok: '', x: '',
+  galleryIntro: 'Behind every outreach are people who chose to show up. These photographs follow our volunteers from busy streets to the riverbank, and the women and families we serve along the way.',
+  nextOn: false, nextTitle: '', nextDate: '', nextTime: '', nextPlace: '', nextText: '', nextImage: '', nextCta: '', nextLink: '',
   slideSeconds: 5.5
 };
 export const DEFAULT_SLIDES = [
@@ -45,4 +47,19 @@ export const DEFAULT_PROGRAMMES = [
   {title:'Breast cancer awareness and free screening', body:'Each year our volunteers set up in the open air, check blood pressure, talk through early detection and offer screening at no cost. Early awareness saves lives.', gallery:[{url:'assets/bp-check.jpg',caption:'Free health checks',pos:'50% 50%'},{url:'assets/awareness-talk.jpg',caption:'Awareness talks',pos:'50% 50%'}], order:1, published:true},
   {title:'Lady Cornelia Donates Sanitary Pads', body:'Our volunteers bring sanitary pads straight to girls and women in the community, because dignity during her period should never depend on what a family can afford.', gallery:[{url:'assets/pads-volunteers.jpg',caption:'Our volunteers',pos:'50% 30%'},{url:'assets/pads-community.jpg',caption:'Pads shared with the community',pos:'50% 40%'}], order:2, published:true},
   {title:'Street Feeding Project', body:'Under the banner Love for the Street, our volunteers go out to people living on the streets and serve them a meal with a kind word. It is our way of serving humanity, one plate at a time.', gallery:[{url:'assets/street-feeding.jpg',caption:'Street Feeding Project',pos:'50% 45%'}], order:3, published:true}
+];
+export const DEFAULT_GALLERY = [
+  {title:'Showing up, speaking up', body:'Our work begins in the open: a conversation about early detection, a meal served on the street, a smile that tells someone they are seen. Hope, Fight, Cure is more than words on a shirt. It is how we show up.', gallery:[
+    {url:'assets/gallery-hope-fight-cure.jpg',caption:'Speaking up for early detection',note:'Early detection saves lives. Every conversation helps a woman get checked sooner.',alt:'A volunteer in a Hope Fight Cure breast cancer awareness T-shirt speaking into a microphone',pos:'50% 50%'},
+    {url:'assets/gallery-community-gathering.jpg',caption:'A community comes together',note:'Neighbours gather together, and every one of them matters.',alt:'Women and girls in colourful dresses gathered along a roadside under the trees',pos:'50% 60%'},
+    {url:'assets/gallery-street-feeding-frame.jpg',caption:'Smiles at the Street Feeding Project',note:'Love for the Street: serving humanity, one plate at a time.',alt:'A volunteer in a yellow Street Feeding Project T-shirt smiling through an Instagram-style photo frame',pos:'50% 45%'}
+  ], order:1, published:true},
+  {title:'Where the road ends, we keep going', body:'Some of the families who need us most live beyond the end of the road. So our volunteers put on life jackets, board the canoes and cross the water, carrying supplies for the people waiting on the other side.', gallery:[
+    {url:'assets/gallery-life-jackets.jpg',caption:'Life jackets on, ready to go',note:'Safety first. Everyone is kitted out before the crossing.',alt:'Volunteers in orange life jackets gathered by the river bank',pos:'50% 35%'},
+    {url:'assets/gallery-river-landing.jpg',caption:'At the landing, before the crossing',note:'Last smiles on dry land before the boats set off.',alt:'Four smiling volunteers at the river landing, two wearing orange life jackets',pos:'50% 35%'},
+    {url:'assets/gallery-boarding-canoes.jpg',caption:'Boarding the canoes',note:'Team and supplies loaded, one canoe at a time.',alt:'Volunteers in life jackets boarding long wooden canoes at the river bank',pos:'50% 50%'},
+    {url:'assets/gallery-river-crossing.jpg',caption:'Crossing the river',note:'A long way over open water for the families on the far side.',alt:'A small wooden canoe carrying volunteers across a wide river lined with green forest',pos:'50% 62%'},
+    {url:'assets/gallery-carrying-supplies.jpg',caption:'Carrying supplies to the community',note:'Hand to hand, pack by pack.',alt:'Volunteers carrying packs of sanitary pads and household supplies under a large tree',pos:'50% 50%'},
+    {url:'assets/gallery-together.jpg',caption:'Together with the community',note:'The reason we cross: people waiting to be seen and supported.',alt:'Volunteers and community members standing together in front of the Street Feeding Project banner',pos:'50% 40%'}
+  ], order:2, published:true}
 ];

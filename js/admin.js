@@ -1,4 +1,4 @@
-import {ICONS,DEFAULT_SETTINGS,DEFAULT_SLIDES,DEFAULT_PILLARS,DEFAULT_PROGRAMMES} from './defaults.js';
+import {ICONS,DEFAULT_SETTINGS,DEFAULT_SLIDES,DEFAULT_PILLARS,DEFAULT_PROGRAMMES,DEFAULT_GALLERY} from './defaults.js';
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,sendPasswordResetEmail} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
 import {getFirestore,collection,getDocs,getDoc,doc,addDoc,setDoc,updateDoc,deleteDoc,writeBatch,serverTimestamp} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
@@ -64,13 +64,18 @@ const C={
   {k:'title',t:'text',label:'Title',req:1,full:1},{k:'body',t:'textarea',label:'Description',rows:6,full:1},{k:'gallery',t:'gallery',label:'Photos (up to 4)',full:1},
   {k:'order',t:'number',label:'Order'},{k:'published',t:'check',label:'Show on website',def:true}],
   title:i=>i.title,thumb:i=>i.gallery?.[0]?.url,meta:i=>`${(i.gallery||[]).length} photo(s)`},
+ gallery:{label:'Story gallery',single:'chapter',def:DEFAULT_GALLERY,fields:[
+  {k:'title',t:'text',label:'Chapter title',req:1,full:1},{k:'body',t:'textarea',label:'Chapter story',rows:5,full:1},{k:'gallery',t:'gallery',label:'Photos (up to 8)',full:1,max:8},
+  {k:'order',t:'number',label:'Order'},{k:'published',t:'check',label:'Show on website',def:true}],
+  title:i=>i.title,thumb:i=>i.gallery?.[0]?.url,meta:i=>`${(i.gallery||[]).length} photo(s)`},
  pillars:{label:'What we support',single:'focus area',def:DEFAULT_PILLARS,fields:[
   {k:'title',t:'text',label:'Title',req:1,full:1},{k:'text',t:'textarea',label:'Short description',rows:3,full:1},{k:'icon',t:'select',label:'Icon',opts:ICON_OPTS,def:'heart'},
   {k:'order',t:'number',label:'Order'},{k:'published',t:'check',label:'Show on website',def:true}],
   title:i=>i.title,thumb:null,icon:i=>`<svg viewBox="0 0 48 48" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${ICONS[i.icon]||ICONS.heart}</svg>`,meta:i=>i.text}
 };
 const SET_GROUPS=[
- ['Hero & intro',[['heroTitle','text','Hero headline'],['heroLead','textarea','Hero paragraph'],['slideSeconds','number','Seconds per hero slide'],['mission','textarea','Mission'],['vision','textarea','Vision'],['supportIntro','text','“What we support” intro'],['programmesIntro','textarea','“Our programmes” intro']]],
+ ['Next project banner',[['nextOn','check','Show the banner on the website'],['nextTitle','text','Project name'],['nextDate','date','Date'],['nextTime','text','Time (for example 9:00 AM)'],['nextPlace','text','Place'],['nextText','textarea','Short description',4],['nextImage','image','Photo (optional)'],['nextCta','text','Button text'],['nextLink','text','Button link (leave empty to open the donate form)']]],
+ ['Hero & intro',[['heroTitle','text','Hero headline'],['heroLead','textarea','Hero paragraph'],['slideSeconds','number','Seconds per hero slide'],['mission','textarea','Mission'],['vision','textarea','Vision'],['supportIntro','text','“What we support” intro'],['programmesIntro','textarea','“Our programmes” intro'],['galleryIntro','textarea','“Our story in pictures” intro']]],
  ['Founder',[['founderName','text','Name'],['founderRole','text','Role line'],['founderBio','textarea','Biography',8],['founderQuote','text','Quote'],['founderPhoto','image','Portrait photo']]],
  ['Contact & footer',[['tagline','text','Footer tagline'],['email','text','Foundation email'],['phone','text','Phone'],['facebook','text','Facebook URL'],['instagram','text','Instagram URL'],['tiktok','text','TikTok URL'],['x','text','X / Twitter URL']]],
  ['Giving',[['paystackKey','text','Paystack public key'],['amounts','text','Quick amounts (GH₵, comma separated)'],['bankDetails','textarea','Bank transfer details',5]]]
@@ -91,6 +96,7 @@ function fieldHTML(f,v){
  if(f.t==='check')return `<label class="${f.full?'full':''}"><input type="checkbox" id="${id}" ${val?'checked':''}> ${esc(f.label)}</label>`;
  const w=f.full?'full':'';let inner='';
  if(f.t==='text')inner=`<input id="${id}" value="${esc(val)}">`;
+ else if(f.t==='date')inner=`<input id="${id}" type="date" value="${esc(val)}">`;
  else if(f.t==='number')inner=`<input id="${id}" type="number" step="any" value="${esc(val)}">`;
  else if(f.t==='textarea')inner=`<textarea id="${id}" rows="${f.rows||4}">${esc(val)}</textarea>`;
  else if(f.t==='select')inner=`<select id="${id}">${f.opts.map(o=>`<option ${o===val?'selected':''}>${esc(o)}</option>`).join('')}</select>`;
@@ -100,7 +106,7 @@ function fieldHTML(f,v){
  return `<div class="${w}"><label for="${id}">${esc(f.label)}</label>${inner}</div>`;
 }
 function galRow(g={}){
- return `<div class="grow"><div class="row"><input class="g-url" placeholder="Image URL" value="${esc(g.url||'')}"><input class="g-cap" placeholder="Caption" value="${esc(g.caption||'')}"></div><div style="display:flex;gap:6px"><button type="button" class="btn ghost sm g-up">Upload</button><button type="button" class="btn danger sm g-rm">✕</button></div><input class="g-pos full" placeholder="Focus e.g. 50% 40%" value="${esc(g.pos||'50% 50%')}"></div>`;
+ return `<div class="grow"><div class="row"><input class="g-url" placeholder="Image URL" value="${esc(g.url||'')}"><input class="g-cap" placeholder="Caption" value="${esc(g.caption||'')}"></div><div style="display:flex;gap:6px"><button type="button" class="btn ghost sm g-up">Upload</button><button type="button" class="btn danger sm g-rm">✕</button></div><input class="g-pos full" placeholder="Focus e.g. 50% 40%" value="${esc(g.pos||'50% 50%')}"><input class="g-note full" placeholder="Text on the back of the card (optional)" value="${esc(g.note||'')}"></div>`;
 }
 function wire(fields,root){
  root.querySelectorAll('[data-up]').forEach(b=>b.onclick=()=>pickFile(u=>{const i=root.querySelector('#'+b.dataset.up);i.value=u;i.dispatchEvent(new Event('input'))}));
@@ -110,11 +116,11 @@ function wire(fields,root){
   const up=()=>{h.value=`${x.value}% ${y.value}%`;if(img)img.style.backgroundPosition=h.value};x.oninput=y.oninput=up;up();
  });
  fields.filter(f=>f.t==='gallery').forEach(f=>{
-  const rows=root.querySelector('#f_'+f.k+'_rows'),add=root.querySelector('#f_'+f.k+'_add');
+  const rows=root.querySelector('#f_'+f.k+'_rows'),add=root.querySelector('#f_'+f.k+'_add'),max=f.max||4;
   const bind=()=>{rows.querySelectorAll('.grow').forEach(r=>{r.querySelector('.g-rm').onclick=()=>{r.remove();add.hidden=false};r.querySelector('.g-up').onclick=()=>pickFile(u=>r.querySelector('.g-url').value=u)})};
-  add.onclick=()=>{if(rows.children.length>=4)return;rows.insertAdjacentHTML('beforeend',galRow());bind();if(rows.children.length>=4)add.hidden=true};
-  root._gal=()=>[...rows.querySelectorAll('.grow')].map(r=>({url:r.querySelector('.g-url').value.trim(),caption:r.querySelector('.g-cap').value.trim(),pos:r.querySelector('.g-pos').value.trim()||'50% 50%'})).filter(g=>g.url);
-  root._galInit=g=>{rows.innerHTML=(g||[]).slice(0,4).map(galRow).join('');bind();add.hidden=rows.children.length>=4};
+  add.onclick=()=>{if(rows.children.length>=max)return;rows.insertAdjacentHTML('beforeend',galRow());bind();if(rows.children.length>=max)add.hidden=true};
+  root._gal=()=>[...rows.querySelectorAll('.grow')].map(r=>({url:r.querySelector('.g-url').value.trim(),caption:r.querySelector('.g-cap').value.trim(),pos:r.querySelector('.g-pos').value.trim()||'50% 50%',note:r.querySelector('.g-note').value.trim()})).filter(g=>g.url);
+  root._galInit=g=>{rows.innerHTML=(g||[]).slice(0,max).map(galRow).join('');bind();add.hidden=rows.children.length>=max};
  });
 }
 function collect(fields,root){
@@ -167,13 +173,13 @@ async function showCollection(name){
 async function showSettings(){
  setHead('Site settings','<button class="btn" id="sv">Save changes</button>');
  const snap=await getDoc(doc(db,'settings','site')),S={...DEFAULT_SETTINGS,...(snap.exists()?snap.data():{})};
- view.innerHTML=SET_GROUPS.map(([g,fs])=>`<div class="group">${g}</div><div class="card"><div class="fgrid">${fs.map(([k,t,l,r])=>fieldHTML({k,t,label:l,rows:r,full:t!=='number'},S[k])).join('')}</div></div>`).join('')+
+ view.innerHTML=SET_GROUPS.map(([g,fs])=>`<div class="group">${g}</div><div class="card"><div class="fgrid">${fs.map(([k,t,l,r])=>fieldHTML({k,t,label:l,rows:r,full:t!=='number'&&t!=='date'},S[k])).join('')}</div></div>`).join('')+
  `<div class="group">Starter content</div><div class="card"><button class="btn ghost" id="seed">Load default content</button></div>`;
  const fields=SET_GROUPS.flatMap(g=>g[1].map(([k,t])=>({k,t})));wire(fields,view);
  $('#sv').onclick=async()=>{await setDoc(doc(db,'settings','site'),{...collect(fields,view),updatedAt:serverTimestamp()},{merge:true});toast('Settings saved')};
  $('#seed').onclick=async()=>{
   if(!confirm('Load default content?'))return;
-  for(const n of ['slides','programmes','pillars'])if(!(await all(n)).length){const bt=writeBatch(db);C[n].def.forEach(d=>bt.set(doc(collection(db,n)),{...d,createdAt:serverTimestamp()}));await bt.commit()}
+  for(const n of ['slides','programmes','pillars','gallery'])if(!(await all(n)).length){const bt=writeBatch(db);C[n].def.forEach(d=>bt.set(doc(collection(db,n)),{...d,createdAt:serverTimestamp()}));await bt.commit()}
   await setDoc(doc(db,'settings','site'),{...DEFAULT_SETTINGS,...(snap.exists()?snap.data():{}),seeded:true},{merge:true});toast('Default content loaded');showSettings();
  };
 }
@@ -219,7 +225,7 @@ async function showDash(){
 }
 async function refreshBadge(){try{const n=(await all('inquiries')).filter(i=>i.status==='new').length;const b=document.querySelector('#nav [data-v=inbox] .pill');if(b){b.textContent=n;b.hidden=!n}}catch(_){}}
 
-const VIEWS={dash:['Dashboard',showDash],slides:['Hero slides',()=>showCollection('slides')],programmes:['Programmes',()=>showCollection('programmes')],pillars:['What we support',()=>showCollection('pillars')],settings:['Site settings',showSettings],donations:['Donations',showDonations],inbox:['Messages','']};
+const VIEWS={dash:['Dashboard',showDash],slides:['Hero slides',()=>showCollection('slides')],programmes:['Programmes',()=>showCollection('programmes')],gallery:['Story gallery',()=>showCollection('gallery')],pillars:['What we support',()=>showCollection('pillars')],settings:['Site settings',showSettings],donations:['Donations',showDonations],inbox:['Messages','']};
 VIEWS.inbox=['Messages',showInbox];
 function go(v){
  document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-current',String(b.dataset.v===v)));
