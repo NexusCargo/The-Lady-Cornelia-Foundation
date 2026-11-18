@@ -65,7 +65,7 @@ const C={
   {k:'order',t:'number',label:'Order'},{k:'published',t:'check',label:'Show on website',def:true}],
   title:i=>i.title,thumb:null,icon:i=>`<b>${i.order||''}</b>`,meta:i=>(i.body||'').slice(0,70)},
  gallery:{label:'Gallery',single:'project',def:DEFAULT_GALLERY,fields:[
-  {k:'title',t:'text',label:'Project name',req:1,full:1},{k:'body',t:'textarea',label:'Short write-up',rows:5,full:1},{k:'gallery',t:'gallery',label:'Photos (up to 8)',full:1,max:8},
+  {k:'title',t:'text',label:'Project name',req:1,full:1},{k:'gallery',t:'gallery',label:'Photos (up to 8)',full:1,max:8},
   {k:'order',t:'number',label:'Order'},{k:'published',t:'check',label:'Show on website',def:true}],
   title:i=>i.title,thumb:i=>i.gallery?.[0]?.url,meta:i=>`${(i.gallery||[]).length} photo(s)`},
  pillars:{label:'What we support',single:'focus area',def:DEFAULT_PILLARS,fields:[

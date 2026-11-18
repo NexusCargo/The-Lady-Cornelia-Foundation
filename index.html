@@ -23,6 +23,7 @@
 </header>
 
 <main id="top">
+<div id="homeView">
 <section class="hero">
  <div class="wrap">
   <div>
@@ -75,18 +76,6 @@
  </div>
 </section>
 
-<section class="gal" id="gallery">
- <div class="wrap">
-  <div class="head"><h2>Gallery</h2><p id="galleryIntro"></p></div>
-  <div class="seg gsort" role="group" aria-label="Group gallery by"><button type="button" data-sort="name" aria-selected="true">Project name</button><button type="button" data-sort="date" aria-selected="false">Date modified</button></div>
-  <div id="galleryList"></div>
-  <div class="gal-cta">
-   <p>Every crossing, every meal and every screening is made possible by people like you.</p>
-   <div class="actions"><button class="btn" data-open="donate">Donate</button><button class="btn ghost" data-open="join" data-type="volunteer" data-title="Volunteer with us">Volunteer</button></div>
-  </div>
- </div>
-</section>
-
 <section class="founder" id="founder">
  <div class="wrap">
   <div class="duo"><div class="arch"><img id="founderPhoto" alt="Portrait of the founder" loading="lazy"></div></div>
@@ -110,6 +99,25 @@
   </div>
  </div>
 </section>
+</div>
+
+<div id="galleryView" hidden>
+<section class="gal" id="gallery">
+ <div class="wrap">
+  <a class="back" href="#top">← Back to home</a>
+  <div class="head"><h2>Gallery</h2><p id="galleryIntro"></p></div>
+  <div class="gtools">
+   <div class="seg gsort" role="group" aria-label="Order projects by"><button type="button" data-sort="name" aria-selected="true">Project name</button><button type="button" data-sort="date" aria-selected="false">Date modified</button></div>
+   <div class="gjump" id="gJump" aria-label="Jump to a project"></div>
+  </div>
+  <div id="galleryList"></div>
+  <div class="gal-cta">
+   <p>Every crossing, every meal and every screening is made possible by people like you.</p>
+   <div class="actions"><button class="btn" data-open="donate">Donate</button><button class="btn ghost" data-open="join" data-type="volunteer" data-title="Volunteer with us">Volunteer</button></div>
+  </div>
+ </div>
+</section>
+</div>
 </main>
 
 <footer>

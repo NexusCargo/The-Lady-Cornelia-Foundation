@@ -66,15 +66,15 @@ function renderGallery(list){
  drawGallery();
 }
 function drawGallery(){
- const l=galData.slice().sort(galSort==='date'?(a,b)=>stamp(b)-stamp(a)||(a.order??0)-(b.order??0):(a,b)=>String(a.title).localeCompare(String(b.title)));
- $('#gallery').hidden=!l.length;
+ const l=galData.filter(c=>c.gallery.length).sort(galSort==='date'?(a,b)=>stamp(b)-stamp(a)||(a.order??0)-(b.order??0):(a,b)=>String(a.title).localeCompare(String(b.title)));
  $$('.gsort button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.sort===galSort)));
- $('#galleryList').innerHTML=l.map((c,i)=>{
-  const t=stamp(c),kick=t?'Updated '+new Date(t).toLocaleDateString('en-GB',{month:'long',year:'numeric'}):'Project';
+ $('#gJump').innerHTML=l.map(c=>`<a href="#g-${slug(c.title)}">${esc(c.title)}</a>`).join('');
+ $('#galleryList').innerHTML=l.map(c=>{
+  const t=stamp(c),n=c.gallery.length;
   const pics=c.gallery.map(m=>`<figure class="pol"><img src="${esc(m.url)}" alt="${esc(m.alt||m.caption||c.title)}" loading="lazy">${m.caption?`<figcaption>${esc(m.caption)}</figcaption>`:''}</figure>`).join('');
-  return `<article class="scatter${i%2?' alt':''}" id="g-${slug(c.title)}"><div class="note"><span class="kick">${kick}</span><h3>${esc(c.title)}</h3>${paras(c.body)}</div>${pics}</article>`;
- }).join('');
- $$('.pcard').forEach(a=>{const el=document.getElementById('g-'+a.dataset.slug),k=a.querySelector('a');if(el){const n=el.querySelectorAll('.pol').length;k.href='#g-'+a.dataset.slug;k.textContent=`See ${n} photo${n===1?'':'s'}`}else k.href='#gallery'});
+  return `<section class="gproj" id="g-${slug(c.title)}"><div class="gproj-head"><h3>${esc(c.title)}</h3><span class="count">${n} photo${n===1?'':'s'}${t?' · Updated '+new Date(t).toLocaleDateString('en-GB',{month:'long',year:'numeric'}):''}</span></div><div class="pgrid">${pics}</div></section>`;
+ }).join('')||'<p>Photos are coming soon.</p>';
+ $$('.pcard').forEach(a=>{const el=document.getElementById('g-'+a.dataset.slug),k=a.querySelector('a');if(el){const n=el.querySelectorAll('.pol').length;k.href='#g-'+a.dataset.slug;k.textContent=`See ${n} photo${n===1?'':'s'}`;k.hidden=false}else k.hidden=true});
 }
 document.addEventListener('click',e=>{const b=e.target.closest('.gsort button');if(b){galSort=b.dataset.sort;drawGallery()}});
 
@@ -99,6 +99,17 @@ let x0=null;
 root.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});
 root.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>40){ssGo(SS.i+(dx<0?1:-1));ssStart()}});
 document.addEventListener('visibilitychange',()=>{document.hidden?ssStop():ssStart()});
+
+const hv=$('#homeView'),gv=$('#galleryView');
+let inGallery=false;
+function route(first){
+ const h=decodeURIComponent(location.hash||''),g=h==='#gallery'||h.startsWith('#g-'),switched=g!==inGallery;
+ inGallery=g;gv.hidden=!g;hv.hidden=g;
+ $$('header nav a').forEach(a=>a.getAttribute('href')==='#gallery'&&(g?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current')));
+ const beh=switched?'instant':'smooth',el=h.length>1&&h!=='#top'&&h!=='#gallery'?document.getElementById(h.slice(1)):null;
+ if(el)el.scrollIntoView({behavior:beh});else if(!first||switched)window.scrollTo({top:0,behavior:beh});
+}
+addEventListener('hashchange',()=>route(false));
 
 let joinType='volunteer',paying=false;
 document.addEventListener('click',e=>{
@@ -208,6 +219,7 @@ $('#df').addEventListener('submit',e=>{
 
 function applyAll(slides,pillars,progs,gallery){renderText();used.clear();used.add(S.founderPhoto);if(S.nextOn&&S.nextImage)used.add(S.nextImage);renderSlides(slides);renderPillars(pillars);renderProgrammes(progs);renderGallery(gallery)}
 applyAll(DEFAULT_SLIDES,DEFAULT_PILLARS,DEFAULT_PROGRAMMES,DEFAULT_GALLERY);
+route(true);
 if(fb&&!/REPLACE/.test(fb.apiKey)){
  try{
   const V='10.14.1',[{initializeApp},fs]=await Promise.all([import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`),import(`https://www.gstatic.com/firebasejs/${V}/firebase-firestore.js`)]);

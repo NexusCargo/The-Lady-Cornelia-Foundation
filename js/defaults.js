@@ -25,7 +25,7 @@ export const DEFAULT_SETTINGS = {
   amounts: '50,100,200,500,1000',
   bankDetails: '',
   facebook: '', instagram: '', tiktok: '', x: '',
-  galleryIntro: 'Four projects, told in pictures. Browse the photographs, click any one to see it larger, and read a little about the work behind each.',
+  galleryIntro: 'Our projects, told in pictures. Photographs are grouped by project. Click any one to see it larger.',
   nextOn: false, nextTitle: '', nextDate: '', nextTime: '', nextPlace: '', nextText: '', nextImage: '', nextCta: '', nextLink: '',
   slideSeconds: 5.5
 };
@@ -43,7 +43,8 @@ export const DEFAULT_PILLARS = [
 export const DEFAULT_PROGRAMMES = [
   {title:'Breast cancer awareness and free screening', body:'Each year our volunteers set up in the open air, check blood pressure, talk through early detection and offer screening at no cost. Early awareness saves lives.', gallery:[], order:1, published:true},
   {title:'Lady Cornelia Donates Sanitary Pads', body:'Our volunteers bring sanitary pads straight to girls and women in the community, because dignity during her period should never depend on what a family can afford.', gallery:[], order:2, published:true},
-  {title:'Street Feeding Project', body:'Under the banner Love for the Street, our volunteers go out to people living on the streets and serve them a meal with a kind word. It is our way of serving humanity, one plate at a time.', gallery:[], order:3, published:true}
+  {title:'Street Feeding Project', body:'Under the banner Love for the Street, our volunteers go out to people living on the streets and serve them a meal with a kind word. It is our way of serving humanity, one plate at a time.', gallery:[], order:3, published:true},
+  {title:'Where the road ends, we keep going', body:'Some of the families who need us most live beyond the end of the road. So our volunteers put on life jackets, board the canoes and cross the water, carrying supplies to the people waiting on the other side.', gallery:[], order:4, published:true}
 ];
 export const DEFAULT_GALLERY = [
   {title:'Breast cancer awareness and free screening', body:'Every year our volunteers take the conversation to where women already gather: pink T-shirts, open-air tents, free blood pressure checks and honest talk about early detection. Hope, Fight, Cure is more than words on a shirt. It is how we show up.', gallery:[
