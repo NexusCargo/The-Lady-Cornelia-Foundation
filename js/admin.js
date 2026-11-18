@@ -79,7 +79,7 @@ const C={
   {k:'order',t:'number',label:'Order'},{k:'published',t:'check',label:'Show on website',def:true}],
   title:i=>i.title,thumb:null,icon:i=>`<b>${i.order||''}</b>`,meta:i=>(i.body||'').slice(0,70)},
  gallery:{label:'Story photos',single:'project',def:DEFAULT_GALLERY,fields:[
-  {k:'title',t:'text',label:'Project name',req:1,full:1},{k:'gallery',t:'gallery',label:'Photos (up to 8)',full:1,max:8},
+  {k:'title',t:'text',label:'Project name',req:1,full:1},{k:'gallery',t:'gallery',label:'Photos',full:1,max:8},
   {k:'order',t:'number',label:'Order'},{k:'published',t:'check',label:'Show on website',def:true}],
   title:i=>i.title,thumb:i=>i.gallery?.[0]?.url,meta:i=>`${(i.gallery||[]).length} photo(s)`},
  pillars:{label:'What we support',single:'focus area',def:DEFAULT_PILLARS,fields:[
@@ -88,11 +88,11 @@ const C={
   title:i=>i.title,thumb:null,icon:i=>`<svg viewBox="0 0 48 48" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${ICONS[i.icon]||ICONS.heart}</svg>`,meta:i=>i.text}
 };
 const SET_GROUPS=[
- ['Next project banner',[['nextOn','check','Show the banner on the website'],['nextTitle','text','Project name'],['nextDate','date','Date'],['nextTime','text','Time (for example 9:00 AM)'],['nextPlace','text','Place'],['nextText','textarea','Short description',4],['nextImage','image','Photo (optional)'],['nextCta','text','Button text'],['nextLink','text','Button link (leave empty to open the donate form)']]],
+ ['Next project banner',[['nextOn','check','Show the banner on the website'],['nextTitle','text','Project name'],['nextDate','date','Date'],['nextTime','text','Time'],['nextPlace','text','Venue'],['nextText','textarea','Short description',4],['nextImage','image','Photo'],['nextCta','text','Button text'],['nextLink','text','Button link']]],
  ['Hero & intro',[['heroTitle','text','Hero headline'],['heroLead','textarea','Hero paragraph'],['slideSeconds','number','Seconds per hero slide'],['mission','textarea','Mission'],['vision','textarea','Vision'],['supportIntro','text','“What we support” intro']]],
  ['Founder',[['founderName','text','Name'],['founderRole','text','Role line'],['founderBio','textarea','Biography',8],['founderQuote','text','Quote'],['founderPhoto','image','Portrait photo']]],
  ['Contact & footer',[['tagline','text','Footer tagline'],['email','text','Foundation email'],['phone','text','Phone'],['facebook','text','Facebook URL'],['instagram','text','Instagram URL'],['tiktok','text','TikTok URL'],['x','text','X / Twitter URL']]],
- ['Giving',[['paystackKey','text','Paystack public key'],['amounts','text','Quick amounts (GH₵, comma separated)'],['bankDetails','textarea','Bank transfer details',5]]]
+ ['Giving',[['paystackKey','text','Paystack public key'],['amounts','text','Quick amounts (GH₵)'],['bankDetails','textarea','Bank transfer details',5]]]
 ];
 
 const all=async n=>(await getDocs(collection(db,n))).docs.map(d=>({id:d.id,...d.data()}));
@@ -120,7 +120,7 @@ function fieldHTML(f,v){
  return `<div class="${w}"><label for="${id}">${esc(f.label)}</label>${inner}</div>`;
 }
 function galRow(g={}){
- return `<div class="grow"><div class="row"><input class="g-url" placeholder="Image URL" value="${esc(g.url||'')}"><input class="g-cap" placeholder="Caption" value="${esc(g.caption||'')}"></div><div style="display:flex;gap:6px"><button type="button" class="btn ghost sm g-up">Upload</button><button type="button" class="btn danger sm g-rm">✕</button></div><input class="g-pos full" placeholder="Focus e.g. 50% 40%" value="${esc(g.pos||'50% 50%')}"><input class="g-note full" placeholder="Text on the back of the card (optional)" value="${esc(g.note||'')}"></div>`;
+ return `<div class="grow"><div class="row"><input class="g-url" placeholder="Image URL" value="${esc(g.url||'')}"><input class="g-cap" placeholder="Caption" value="${esc(g.caption||'')}"></div><div style="display:flex;gap:6px"><button type="button" class="btn ghost sm g-up">Upload</button><button type="button" class="btn danger sm g-rm">✕</button></div><input class="g-pos full" placeholder="Focus" value="${esc(g.pos||'50% 50%')}"><input class="g-note full" placeholder="Back of card text" value="${esc(g.note||'')}"></div>`;
 }
 function wire(fields,root){
  root.querySelectorAll('[data-up]').forEach(b=>b.onclick=()=>pickFile(u=>{const i=root.querySelector('#'+b.dataset.up);i.value=u;i.dispatchEvent(new Event('input'))}));

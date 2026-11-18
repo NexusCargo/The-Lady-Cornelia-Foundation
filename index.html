@@ -8,7 +8,7 @@
 <link rel="icon" href="assets/logo-light.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Nunito+Sans:wght@400;600;700&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,800;1,9..144,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Nunito+Sans:wght@400;600;700&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,800;1,9..144,600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/site.css">
 <script src="/api/config"></script>
 <script src="https://js.paystack.co/v1/inline.js" defer></script>
@@ -44,9 +44,10 @@
   <aside class="next" id="next" hidden>
    <div class="nx-card">
    <div class="nx-txt">
-    <span class="kick">Our next project</span>
+    <div class="nx-top"><span class="kick">Our next project</span><span class="nx-soon" id="nxSoon" hidden></span></div>
     <h2 id="nxTitle"></h2>
     <ul class="nx-meta" id="nxMeta"></ul>
+    <div class="nx-cal" id="nxCal" hidden></div>
     <p id="nxText"></p>
     <div class="actions" id="nxAct"></div>
    </div>
@@ -123,7 +124,7 @@
 <label for="dfor">Where should it go?</label><select id="dfor"></select>
 <label for="dn">Full name</label><input id="dn" autocomplete="name">
 <label for="de">Email</label><input id="de" type="email" autocomplete="email">
-<div class="pm note secure" id="pm-online"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Secure payment by Paystack. Pay with Mobile Money (MTN, Telecel, AT) or your bank card on the next screen.</span></div>
+<div class="pm note secure" id="pm-online"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Secure payment by Paystack.</span></div>
 <div id="pm-bank" hidden><p class="pm note" id="bankNote"></p><div class="bankbox" id="bankbox" hidden></div></div>
 <p class="err" id="derr" role="alert"></p>
 <button class="btn" type="submit" id="go">Give GH₵100 with Paystack</button></form></div>

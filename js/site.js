@@ -29,6 +29,44 @@ function renderText(){
  renderNext();
  syncDonate();
 }
+const IC={
+ date:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>',
+ time:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+ place:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>'
+};
+function parseClock(t){
+ t=String(t||'');
+ let m=t.match(/(\d{1,2})(?:[:.](\d{2}))?\s*([ap])\.?m\b/i);
+ if(m){let h=+m[1]%12;if(/p/i.test(m[3]))h+=12;return [h,+(m[2]||0)]}
+ m=t.match(/\b([01]?\d|2[0-3])[:.]([0-5]\d)\b/);
+ return m?[+m[1],+m[2]]:null;
+}
+function niceTime(t){
+ const x=String(t||'').trim();
+ if(!/^\d{1,2}(?:[:.]\d{2})?\s*(?:[ap]\.?m\.?)?$/i.test(x))return x;
+ const c=parseClock(x);if(!c)return x;
+ return (c[0]%12||12)+':'+String(c[1]).padStart(2,'0')+' '+(c[0]<12?'AM':'PM');
+}
+function calendarLinks(){
+ const [y,mo,da]=S.nextDate.split('-').map(Number),tm=parseClock(S.nextTime),allDay=!tm;
+ const start=allDay?new Date(Date.UTC(y,mo-1,da)):new Date(Date.UTC(y,mo-1,da,tm[0],tm[1]));
+ const end=allDay?new Date(Date.UTC(y,mo-1,da+1)):new Date(start.getTime()+72e5);
+ const z=d=>d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,''),day=d=>z(d).slice(0,8);
+ const title=String(S.nextTitle||'').trim(),place=String(S.nextPlace||'').trim();
+ const desc=[String(S.nextText||'').trim(),location.origin].filter(Boolean).join('\n\n');
+ const q=o=>Object.entries(o).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
+ const google='https://calendar.google.com/calendar/render?'+q({action:'TEMPLATE',text:title,dates:allDay?day(start)+'/'+day(end):z(start)+'/'+z(end),details:desc,location:place});
+ const outlook='https://outlook.live.com/calendar/0/deeplink/compose?'+q({path:'/calendar/action/compose',rru:'addevent',subject:title,startdt:start.toISOString(),enddt:end.toISOString(),body:desc,location:place,allday:allDay?'true':'false'});
+ const ics=t=>String(t).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n');
+ const alarm=(w,d)=>['BEGIN:VALARM','TRIGGER:'+w,'ACTION:DISPLAY','DESCRIPTION:'+ics(d),'END:VALARM'];
+ const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//The Lady Cornelia Foundation//Events//EN','CALSCALE:GREGORIAN','BEGIN:VEVENT',
+  'UID:'+S.nextDate+'-'+title.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'@ladycorneliafoundation','DTSTAMP:'+z(new Date()),
+  allDay?'DTSTART;VALUE=DATE:'+day(start):'DTSTART:'+z(start),allDay?'DTEND;VALUE=DATE:'+day(end):'DTEND:'+z(end),
+  'SUMMARY:'+ics(title),place?'LOCATION:'+ics(place):'',desc?'DESCRIPTION:'+ics(desc):'',
+  ...alarm('-P1D',title+' is tomorrow'),...alarm('-PT2H',title+' starts soon'),'END:VEVENT','END:VCALENDAR'].filter(Boolean);
+ const file=(title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'event')+'.ics';
+ return {google,outlook,ics:'data:text/calendar;charset=utf-8,'+encodeURIComponent(lines.join('\r\n')),file};
+}
 function renderNext(){
  const box=$('#next'),on=S.nextOn&&String(S.nextTitle||'').trim();
  let d=null,left=null;
@@ -36,13 +74,17 @@ function renderNext(){
  const wr=$('.mv .wrap');
  if(!on||(left!==null&&left<0)){box.hidden=true;wr.classList.add('solo');return}
  $('#nxTitle').textContent=S.nextTitle;
- const meta=[];
- if(left!==null)meta.push([left===0?'Today':left===1?'Tomorrow':`In ${left} days`,'soon']);
- if(d)meta.push([d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+(S.nextTime?', '+S.nextTime:'')]);
- else if(S.nextTime)meta.push([S.nextTime]);
- if(S.nextPlace)meta.push([S.nextPlace]);
- $('#nxMeta').innerHTML=meta.map(([t,c])=>`<li${c?` class="${c}"`:''}>${esc(t)}</li>`).join('');
- $('#nxMeta').hidden=!meta.length;
+ const soon=$('#nxSoon');
+ soon.hidden=left===null;if(left!==null)soon.textContent=left===0?'Today':left===1?'Tomorrow':`In ${left} days`;
+ const rows=[];
+ if(d)rows.push(['date','Date',d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})]);
+ if(S.nextTime)rows.push(['time','Time',niceTime(S.nextTime)]);
+ if(S.nextPlace)rows.push(['place','Venue',S.nextPlace]);
+ $('#nxMeta').innerHTML=rows.map(([k,l,v])=>`<li><span class="ic">${IC[k]}</span><span class="tx"><small>${l}</small><b>${esc(v)}</b></span></li>`).join('');
+ $('#nxMeta').hidden=!rows.length;
+ const cal=$('#nxCal');
+ if(d){const c=calendarLinks();cal.innerHTML=`<span>Add to calendar</span><a href="${esc(c.google)}" target="_blank" rel="noopener">Google</a><a href="${esc(c.outlook)}" target="_blank" rel="noopener">Outlook</a><a href="${c.ics}" download="${esc(c.file)}">Apple / iCal</a>`;cal.hidden=false}
+ else{cal.innerHTML='';cal.hidden=true}
  $('#nxText').innerHTML=paras(S.nextText);$('#nxText').hidden=!S.nextText;
  const link=(S.nextLink||'').trim(),cta=(S.nextCta||'').trim()||(link?'Learn more':'Support this project');
  $('#nxAct').innerHTML=/^https?:\/\//i.test(link)?`<a class="btn" href="${esc(link)}" target="_blank" rel="noopener">${esc(cta)}</a>`:`<button type="button" class="btn" data-open="donate">${esc(cta)}</button>`;
@@ -171,7 +213,7 @@ function syncDonate(){
  $('#amtl').innerHTML=mode==='online'?'Amount':'Amount you plan to give <small>(optional)</small>';
  $('#pm-online').hidden=mode!=='online';$('#pm-bank').hidden=mode!=='bank';
  $('#bankbox').hidden=!hasBank;$('#bankbox').textContent=S.bankDetails||'';
- $('#bankNote').textContent=hasBank?'Transfer to the account below, then enter your name and email so we can thank you and record your gift.':'Enter your name and email and we will send you our bank account details.';
+ $('#bankNote').textContent='';
  $$('.seg button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.mode===mode)));
  $('#derr').textContent='';
 }
