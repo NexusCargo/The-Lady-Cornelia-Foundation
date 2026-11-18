@@ -1,0 +1,8 @@
+{
+  "name": "lady-cornelia-foundation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The Lady Cornelia Foundation website with Firebase backend and admin panel",
+  "dependencies": { "firebase-admin": "^12.6.0" },
+  "engines": { "node": ">=18" }
+}
