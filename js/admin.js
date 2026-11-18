@@ -17,16 +17,19 @@ if(!fb||!fb.apiKey){
 const app=initializeApp(fb),auth=getAuth(app),db=getFirestore(app);
 
 $('#lf').addEventListener('submit',async e=>{
- e.preventDefault();$('#lerr').textContent='';
+ e.preventDefault();const lerr=$('#lerr'),btn=$('#lf button[type=submit]');
+ lerr.style.color='';lerr.textContent='';btn.disabled=true;btn.textContent='Signing in…';
  try{await signInWithEmailAndPassword(auth,$('#le').value.trim(),$('#lp').value)}catch(x){
   const c=x&&x.code||'',m={
    'auth/invalid-credential':'Wrong email or password.','auth/wrong-password':'Wrong email or password.','auth/user-not-found':'Wrong email or password.',
    'auth/invalid-email':'That email address is not valid.','auth/user-disabled':'This account has been disabled.',
    'auth/too-many-requests':'Too many attempts. Wait a few minutes and try again.','auth/network-request-failed':'Network error. Check your connection.',
    'auth/operation-not-allowed':'Email and password sign-in is turned off in Firebase.','auth/invalid-api-key':'The Firebase API key is not valid.',
+   'auth/unauthorized-domain':'This website address is not authorised in Firebase.',
    'auth/api-key-not-valid.-please-pass-a-valid-api-key.':'The Firebase API key is not valid.'};
-  $('#lerr').textContent=m[c]||'Sign-in failed ('+(c||'unknown')+').';
+  lerr.textContent=m[c]||'Sign-in failed ('+(c||'unknown')+').';
  }
+ btn.disabled=false;btn.textContent='Sign in';
 });
 $('#forgot').onclick=async()=>{
  const m=$('#le').value.trim();if(!m)return $('#lerr').textContent='Enter your email first.';
@@ -35,13 +38,16 @@ $('#forgot').onclick=async()=>{
 $('#out').onclick=()=>signOut(auth);
 onAuthStateChanged(auth,async u=>{
  if(!u){$('#app').hidden=true;$('#login').hidden=false;return}
- let isAdmin=false;try{isAdmin=(await getDoc(doc(db,'admins',u.uid))).exists()}catch(_){}
+ let isAdmin=false,fail='';
+ try{isAdmin=(await getDoc(doc(db,'admins',u.uid))).exists()}catch(x){fail=x&&x.code||'error'}
  if(!isAdmin){
-  $('#login').hidden=false;$('#app').hidden=true;
-  $('#lerr').innerHTML='This account is not an admin.';
+  $('#app').hidden=true;$('#login').hidden=false;$('#lerr').style.color='';
+  $('#lerr').textContent=fail?'Signed in, but access could not be checked ('+fail+').':'This account is not an admin.';
+  signOut(auth);
   return;
  }
- $('#login').hidden=true;$('#app').hidden=false;$('#who').textContent=u.email;start();
+ $('#login').hidden=true;$('#app').hidden=false;$('#who').textContent=u.email;
+ try{start()}catch(x){console.error(x);$('#view').innerHTML='<div class="card"><b>Something went wrong.</b><p>'+esc(x.message)+'</p></div>'}
 });
 
 function resize(file,max=1800){

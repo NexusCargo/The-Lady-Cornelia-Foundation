@@ -1,5 +1,6 @@
 :root{--bg:#fff8fa;--surface:#fff;--blush:#ffe6ee;--pink:#e91e72;--ink:#3d1230;--muted:#7a5568;--line:#f6cfdd;--deep:#5a1140;--ok:#17855a;--warn:#b86e00}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.55 "Nunito Sans",system-ui,sans-serif}
 h1,h2,h3{font-family:"Cormorant Garamond",Georgia,serif;margin:0;line-height:1.1}
 .btn{display:inline-block;padding:.6em 1.3em;border-radius:999px;background:var(--pink);color:#fff;font:700 .95rem inherit;font-family:inherit;border:2px solid var(--pink);cursor:pointer;text-decoration:none}
