@@ -52,6 +52,13 @@ function renderNext(){
 }
 function renderPillars(list){
  $('#pillars').innerHTML=list.map(p=>`<div class="pillar"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[p.icon]||ICONS.heart}</svg><h3>${esc(p.title)}</h3><p>${esc(p.text)}</p></div>`).join('');
+ const ps=$$('#pillars .pillar');
+ ps.forEach((el,i)=>{el.style.setProperty('--d',i*.18+'s');el.querySelectorAll('svg *').forEach(n=>n.setAttribute('pathLength','1'))});
+ const box=$('#pillars');
+ if(!('IntersectionObserver' in window)||matchMedia('(prefers-reduced-motion:reduce)').matches){box.classList.remove('anim');return}
+ box.classList.add('anim');
+ const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.35});
+ ps.forEach(el=>io.observe(el));
 }
 function renderProgrammes(list){
  programmes=list;

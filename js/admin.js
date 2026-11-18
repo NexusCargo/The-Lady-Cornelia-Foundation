@@ -18,7 +18,15 @@ const app=initializeApp(fb),auth=getAuth(app),db=getFirestore(app);
 
 $('#lf').addEventListener('submit',async e=>{
  e.preventDefault();$('#lerr').textContent='';
- try{await signInWithEmailAndPassword(auth,$('#le').value.trim(),$('#lp').value)}catch(_){$('#lerr').textContent='Wrong email or password.'}
+ try{await signInWithEmailAndPassword(auth,$('#le').value.trim(),$('#lp').value)}catch(x){
+  const c=x&&x.code||'',m={
+   'auth/invalid-credential':'Wrong email or password.','auth/wrong-password':'Wrong email or password.','auth/user-not-found':'Wrong email or password.',
+   'auth/invalid-email':'That email address is not valid.','auth/user-disabled':'This account has been disabled.',
+   'auth/too-many-requests':'Too many attempts. Wait a few minutes and try again.','auth/network-request-failed':'Network error. Check your connection.',
+   'auth/operation-not-allowed':'Email and password sign-in is turned off in Firebase.','auth/invalid-api-key':'The Firebase API key is not valid.',
+   'auth/api-key-not-valid.-please-pass-a-valid-api-key.':'The Firebase API key is not valid.'};
+  $('#lerr').textContent=m[c]||'Sign-in failed ('+(c||'unknown')+').';
+ }
 });
 $('#forgot').onclick=async()=>{
  const m=$('#le').value.trim();if(!m)return $('#lerr').textContent='Enter your email first.';
