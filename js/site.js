@@ -47,26 +47,6 @@ function niceTime(t){
  const c=parseClock(x);if(!c)return x;
  return (c[0]%12||12)+':'+String(c[1]).padStart(2,'0')+' '+(c[0]<12?'AM':'PM');
 }
-function calendarLinks(){
- const [y,mo,da]=S.nextDate.split('-').map(Number),tm=parseClock(S.nextTime),allDay=!tm;
- const start=allDay?new Date(Date.UTC(y,mo-1,da)):new Date(Date.UTC(y,mo-1,da,tm[0],tm[1]));
- const end=allDay?new Date(Date.UTC(y,mo-1,da+1)):new Date(start.getTime()+72e5);
- const z=d=>d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,''),day=d=>z(d).slice(0,8);
- const title=String(S.nextTitle||'').trim(),place=String(S.nextPlace||'').trim();
- const desc=[String(S.nextText||'').trim(),location.origin].filter(Boolean).join('\n\n');
- const q=o=>Object.entries(o).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
- const google='https://calendar.google.com/calendar/render?'+q({action:'TEMPLATE',text:title,dates:allDay?day(start)+'/'+day(end):z(start)+'/'+z(end),details:desc,location:place});
- const outlook='https://outlook.live.com/calendar/0/deeplink/compose?'+q({path:'/calendar/action/compose',rru:'addevent',subject:title,startdt:start.toISOString(),enddt:end.toISOString(),body:desc,location:place,allday:allDay?'true':'false'});
- const ics=t=>String(t).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n');
- const alarm=(w,d)=>['BEGIN:VALARM','TRIGGER:'+w,'ACTION:DISPLAY','DESCRIPTION:'+ics(d),'END:VALARM'];
- const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//The Lady Cornelia Foundation//Events//EN','CALSCALE:GREGORIAN','BEGIN:VEVENT',
-  'UID:'+S.nextDate+'-'+title.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'@ladycorneliafoundation','DTSTAMP:'+z(new Date()),
-  allDay?'DTSTART;VALUE=DATE:'+day(start):'DTSTART:'+z(start),allDay?'DTEND;VALUE=DATE:'+day(end):'DTEND:'+z(end),
-  'SUMMARY:'+ics(title),place?'LOCATION:'+ics(place):'',desc?'DESCRIPTION:'+ics(desc):'',
-  ...alarm('-P1D',title+' is tomorrow'),...alarm('-PT2H',title+' starts soon'),'END:VEVENT','END:VCALENDAR'].filter(Boolean);
- const file=(title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'event')+'.ics';
- return {google,outlook,ics:'data:text/calendar;charset=utf-8,'+encodeURIComponent(lines.join('\r\n')),file};
-}
 function renderNext(){
  const box=$('#next'),on=S.nextOn&&String(S.nextTitle||'').trim();
  let d=null,left=null;
@@ -82,9 +62,6 @@ function renderNext(){
  if(S.nextPlace)rows.push(['place','Venue',S.nextPlace]);
  $('#nxMeta').innerHTML=rows.map(([k,l,v])=>`<li><span class="ic">${IC[k]}</span><span class="tx"><small>${l}</small><b>${esc(v)}</b></span></li>`).join('');
  $('#nxMeta').hidden=!rows.length;
- const cal=$('#nxCal');
- if(d){const c=calendarLinks();cal.innerHTML=`<span>Add to calendar</span><a href="${esc(c.google)}" target="_blank" rel="noopener">Google</a><a href="${esc(c.outlook)}" target="_blank" rel="noopener">Outlook</a><a href="${c.ics}" download="${esc(c.file)}">Apple / iCal</a>`;cal.hidden=false}
- else{cal.innerHTML='';cal.hidden=true}
  $('#nxText').innerHTML=paras(S.nextText);$('#nxText').hidden=!S.nextText;
  const link=(S.nextLink||'').trim(),cta=(S.nextCta||'').trim()||(link?'Learn more':'Support this project');
  $('#nxAct').innerHTML=/^https?:\/\//i.test(link)?`<a class="btn" href="${esc(link)}" target="_blank" rel="noopener">${esc(cta)}</a>`:`<button type="button" class="btn" data-open="donate">${esc(cta)}</button>`;
