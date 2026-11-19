@@ -262,3 +262,13 @@ if(fb&&fb.apiKey){
   applyAll(pick(sl,DEFAULT_SLIDES),pick(pi,DEFAULT_PILLARS),pick(pr,DEFAULT_PROGRAMMES),gl.length?gl:DEFAULT_GALLERY);
  }catch(e){console.warn('Using default content',e)}
 }
+
+(()=>{
+ const h=$('header'),b=$('#menuBtn');if(!h||!b)return;
+ const set=o=>{h.classList.toggle('open',o);b.setAttribute('aria-expanded',o?'true':'false');b.setAttribute('aria-label',o?'Close menu':'Open menu')};
+ b.addEventListener('click',e=>{e.stopPropagation();set(!h.classList.contains('open'))});
+ $('#mainnav').addEventListener('click',e=>{if(e.target.closest('a'))set(false)});
+ document.addEventListener('click',e=>{if(h.classList.contains('open')&&!h.contains(e.target))set(false)});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')set(false)});
+ matchMedia('(min-width:861px)').addEventListener('change',e=>{if(e.matches)set(false)});
+})();
