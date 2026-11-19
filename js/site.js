@@ -29,11 +29,6 @@ function renderText(){
  renderNext();
  syncDonate();
 }
-const IC={
- date:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>',
- time:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
- place:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>'
-};
 function parseClock(t){
  t=String(t||'');
  let m=t.match(/(\d{1,2})(?:[:.](\d{2}))?\s*([ap])\.?m\b/i);
@@ -60,7 +55,7 @@ function renderNext(){
  if(d)rows.push(['date','Date',d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})]);
  if(S.nextTime)rows.push(['time','Time',niceTime(S.nextTime)]);
  if(S.nextPlace)rows.push(['place','Venue',S.nextPlace]);
- $('#nxMeta').innerHTML=rows.map(([k,l,v])=>`<li><span class="ic">${IC[k]}</span><span class="tx"><small>${l}</small><b>${esc(v)}</b></span></li>`).join('');
+ $('#nxMeta').innerHTML=rows.map(([k,l,v])=>`<li><small>${l}</small><b>${esc(v)}</b></li>`).join('');
  $('#nxMeta').hidden=!rows.length;
  $('#nxText').innerHTML=paras(S.nextText);$('#nxText').hidden=!S.nextText;
  const link=(S.nextLink||'').trim(),cta=(S.nextCta||'').trim()||(link?'Learn more':'Support this project');

@@ -9,15 +9,15 @@ export const ICONS = {
   heart:'<path d="M24 41S5 29 5 16a10 10 0 0 1 19-4 10 10 0 0 1 19 4c0 13-19 25-19 25z"/>'
 };
 export const DEFAULT_SETTINGS = {
-  heroTitle: 'Empowering women, uplifting communities, building brighter futures.',
-  heroLead: 'We support women, widows and the less privileged with care, education and opportunity, so every family has hope that lasts.',
+  heroTitle: 'The Lady Cornelia Foundation',
+  heroLead: 'Care, education and practical support for women, widows and the less privileged in Ghana.',
   mission: 'To support, empower and create opportunities for women, widows and the less privileged in our communities.',
   vision: 'A society where every woman and family has access to support, hope and sustainable opportunities.',
-  supportIntro: 'Four areas of work, one goal: women and families who can stand on their own.',
+  supportIntro: 'The foundation’s work falls into four areas.',
   founderName: 'Cornelia Kafui Djordjormey',
   founderRole: 'Founder, The Lady Cornelia Foundation',
-  founderBio: 'The Lady Cornelia Foundation, led by Cornelia Kafui Djordjormey, began with a simple belief: a community grows stronger when its women are supported. Cornelia leads that work from the front, standing with women, widows and families at every outreach.\n\nFrom free breast cancer screenings and sanitary pad donations to the Street Feeding Project and education support, every programme is built around listening first and then acting with care.',
-  founderQuote: 'Together we can make a difference.',
+  founderBio: 'Cornelia Kafui Djordjormey founded The Lady Cornelia Foundation to support women, widows and the less privileged in her community. She takes part in the foundation’s outreaches herself.\n\nThe foundation runs free breast cancer screenings, donates sanitary pads, feeds people living on the streets and supports children’s education.',
+  founderQuote: '',
   founderPhoto: 'assets/founder.jpg',
   tagline: 'Together we can make a difference.',
   email: '', phone: '', paystackKey: '',
@@ -31,22 +31,22 @@ export const DEFAULT_SLIDES = [
   {title:'Hope. Fight. Cure.', text:'Free breast cancer screening, blood pressure checks and honest talk about early detection, taken to where women already gather.', image:'assets/screening-banner.jpg', alt:'The founder with a volunteer in front of the breast cancer awareness banner', pos:'50% 45%', order:1, published:true},
   {title:'Dignity should never depend on what a family can afford.', text:'Our volunteers carry sanitary pads to girls and women in the community, hand to hand and pack by pack.', image:'assets/pads-community.jpg', alt:'Volunteers and women of the community holding up packs of sanitary pads', pos:'50% 40%', order:2, published:true},
   {title:'One plate at a time.', text:'Under the banner Love for the Street, our volunteers serve a hot meal and a kind word to people living on the streets.', image:'assets/street-feeding.jpg', alt:'Volunteers and community members behind the Street Feeding Project frame', pos:'50% 40%', order:3, published:true},
-  {title:'Care for widows and the aged.', text:'Practical help and dignity for those who have lost a provider, so no one is left to cope alone.', image:'assets/gallery-community-gathering.jpg', alt:'Women and girls in colourful dresses gathered along a roadside', pos:'50% 40%', order:4, published:true}
+  {title:'Care for widows and the aged.', text:'Practical help for those who have lost a provider, so no one is left to cope alone.', image:'assets/gallery-community-gathering.jpg', alt:'Women and girls in colourful dresses gathered along a roadside', pos:'50% 40%', order:4, published:true}
 ];
 export const DEFAULT_PILLARS = [
-  {title:'Women empowerment', text:'Skills, mentorship and opportunities that help women lead.', icon:'empower', order:1, published:true},
-  {title:'Education support', text:'Helping children and young women stay in school and learn.', icon:'education', order:2, published:true},
-  {title:'Widows and orphans care', text:'Practical help and dignity for those who have lost a provider.', icon:'care', order:3, published:true},
-  {title:'Community development', text:'Health outreach, hygiene support and street feeding that lift whole neighbourhoods.', icon:'community', order:4, published:true}
+  {title:'Women empowerment', text:'Skills and mentorship for women.', icon:'empower', order:1, published:true},
+  {title:'Education support', text:'Helping children and young women stay in school.', icon:'education', order:2, published:true},
+  {title:'Widows and orphans care', text:'Practical help for widows and orphans who have lost a provider.', icon:'care', order:3, published:true},
+  {title:'Community development', text:'Health outreach, hygiene support and street feeding.', icon:'community', order:4, published:true}
 ];
 export const DEFAULT_PROGRAMMES = [
-  {title:'Breast cancer awareness and free screening', body:'Each year our volunteers set up in the open air, check blood pressure, talk through early detection and offer screening at no cost. Early awareness saves lives.', gallery:[], order:1, published:true},
-  {title:'Lady Cornelia Donates Sanitary Pads', body:'Our volunteers bring sanitary pads straight to girls and women in the community, because dignity during her period should never depend on what a family can afford.', gallery:[], order:2, published:true},
-  {title:'Street Feeding Project', body:'Under the banner Love for the Street, our volunteers go out to people living on the streets and serve them a meal with a kind word. It is our way of serving humanity, one plate at a time.', gallery:[], order:3, published:true},
-  {title:'Care for widows and the aged', body:'Practical help and dignity for widows and the aged in our communities, because no one should be left to cope alone after losing a provider.', gallery:[], order:4, published:true}
+  {title:'Breast cancer awareness and free screening', body:'Each year our volunteers set up in the open air, check blood pressure, talk through early detection and offer screening at no cost.', gallery:[], order:1, published:true},
+  {title:'Lady Cornelia Donates Sanitary Pads', body:'Our volunteers bring sanitary pads directly to girls and women in the community.', gallery:[], order:2, published:true},
+  {title:'Street Feeding Project', body:'Under the banner Love for the Street, our volunteers go out to people living on the streets and serve them a meal and a kind word.', gallery:[], order:3, published:true},
+  {title:'Care for widows and the aged', body:'Practical help for widows and the aged in our communities, so no one is left to cope alone after losing a provider.', gallery:[], order:4, published:true}
 ];
 export const DEFAULT_GALLERY = [
-  {title:'Breast cancer awareness and free screening', body:'Every year our volunteers take the conversation to where women already gather: pink T-shirts, open-air tents, free blood pressure checks and honest talk about early detection. Hope, Fight, Cure is more than words on a shirt. It is how we show up.', gallery:[
+  {title:'Breast cancer awareness and free screening', body:'Every year our volunteers take screening to where women already gather: open-air tents, free blood pressure checks and talks on early detection. The pink T-shirts carry the campaign line, Hope, Fight, Cure.', gallery:[
     {url:'assets/awareness-month.jpg',caption:'Pink-clad volunteers and guests',alt:'Women in pink Breast Cancer Awareness T-shirts seated outdoors'},
     {url:'assets/awareness-talk.jpg',caption:'Listening to the awareness talk',alt:'A seated audience in masks at the breast cancer awareness talk'},
     {url:'assets/gallery-hope-fight-cure.jpg',caption:'Speaking up for early detection',alt:'A volunteer in a Hope Fight Cure T-shirt speaking into a microphone'},
@@ -58,12 +58,12 @@ export const DEFAULT_GALLERY = [
     {url:'assets/pads-volunteers.jpg',caption:'Our volunteers',alt:'Two volunteers in Lady Cornelia sanitary pad T-shirts'},
     {url:'assets/gallery-carrying-supplies.jpg',caption:'Carrying supplies to the community',alt:'Volunteers carrying packs of sanitary pads under a large tree'}
   ], order:2, published:true},
-  {title:'Street Feeding Project', body:'Under the banner Love for the Street, we serve a hot meal and a kind word to people living on the streets, and to neighbours who gather for help. It is our way of serving humanity, one plate at a time.', gallery:[
+  {title:'Street Feeding Project', body:'Under the banner Love for the Street, we serve a hot meal and a kind word to people living on the streets, and to neighbours who gather for help.', gallery:[
     {url:'assets/street-feeding.jpg',caption:'Love for the Street',alt:'Volunteers and community members behind the Street Feeding Project frame'},
     {url:'assets/gallery-street-feeding-frame.jpg',caption:'Smiles at the Street Feeding Project',alt:'A volunteer in a yellow Street Feeding Project T-shirt smiling through a photo frame'},
     {url:'assets/gallery-community-gathering.jpg',caption:'A community comes together',alt:'Women and girls in colourful dresses gathered along a roadside'}
   ], order:3, published:true},
-  {title:'Where the road ends, we keep going', body:'Some of the families who need us most live beyond the end of the road. So our volunteers put on life jackets, board the canoes and cross the water, carrying supplies to the people waiting on the other side.', gallery:[
+  {title:'Crossing the river to reach families', body:'Some of the families who need us most live beyond the end of the road. So our volunteers put on life jackets, board the canoes and cross the water, carrying supplies to the people waiting on the other side.', gallery:[
     {url:'assets/gallery-life-jackets.jpg',caption:'Life jackets on, ready to go',alt:'Volunteers in orange life jackets gathered by the river bank'},
     {url:'assets/gallery-river-landing.jpg',caption:'At the landing',alt:'Four smiling volunteers at the river landing'},
     {url:'assets/gallery-boarding-canoes.jpg',caption:'Boarding the canoes',alt:'Volunteers boarding long wooden canoes at the river bank'},
